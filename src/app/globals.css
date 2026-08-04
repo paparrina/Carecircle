@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Texto base 18px en todo el sistema (rem escala desde aquí) */
+html {
+  font-size: 112.5%;
+}
+
+body {
+  @apply bg-background text-ink antialiased;
+  font-feature-settings: "cv05", "cv11";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
