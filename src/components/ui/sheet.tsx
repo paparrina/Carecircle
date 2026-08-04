@@ -2,9 +2,15 @@
 
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
-/** Hoja inferior accesible y sin dependencias (móvil primero). */
+/**
+ * Hoja inferior accesible y sin dependencias (móvil primero).
+ * Se renderiza en un portal sobre <body>: así ningún ancestro con
+ * backdrop-filter/transform (p. ej. la cabecera con blur) puede
+ * "atrapar" su position:fixed.
+ */
 export function BottomSheet({
   open,
   onClose,
@@ -16,6 +22,9 @@ export function BottomSheet({
   title: string;
   children: ReactNode;
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -27,9 +36,9 @@ export function BottomSheet({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
       role="dialog"
@@ -60,6 +69,7 @@ export function BottomSheet({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
