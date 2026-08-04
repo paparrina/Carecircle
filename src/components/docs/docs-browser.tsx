@@ -142,6 +142,7 @@ export function DocsBrowser({
 
   return (
     <div className="flex flex-col gap-4">
+      <p className="-mt-2 text-[13.5px] text-ink-secondary">{t("trustShort")}</p>
       <div className="relative">
         <Search
           size={20}
@@ -278,6 +279,9 @@ export function DocsBrowser({
         title={t("uploadTitle")}
       >
         <div className="flex flex-col gap-4">
+          <p className="rounded-md bg-primary-soft px-3.5 py-2.5 text-[14px] leading-snug text-primary-dark">
+            {t("trustNote")}
+          </p>
           <input
             ref={fileRef}
             type="file"

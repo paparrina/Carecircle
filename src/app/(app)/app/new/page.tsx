@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,14 @@ export default function NewCirclePage() {
             className="mt-1 h-6 w-6 shrink-0 accent-primary"
           />
           <span className="text-[16px] leading-snug text-ink">
-            {t("consent")}
+            {t("consent")}{" "}
+            <Link
+              href="/legal"
+              target="_blank"
+              className="text-primary underline underline-offset-2"
+            >
+              Cómo protegemos los datos →
+            </Link>
           </span>
         </label>
         {state?.error && (

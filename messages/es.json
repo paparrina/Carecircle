@@ -317,7 +317,9 @@
     "open": "Abrir",
     "delete": "Eliminar",
     "confirmDelete": "¿Eliminar \"{name}\"? Esta acción no se puede deshacer.",
-    "viewerNote": "Tu rol es de solo lectura: puedes abrir documentos, pero no subirlos."
+    "viewerNote": "Tu rol es de solo lectura: puedes abrir documentos, pero no subirlos.",
+    "trustNote": "🔒 Privado y cifrado: solo los miembros de tu círculo pueden ver este documento. Se guarda en servidores de la Unión Europea y puedes eliminarlo cuando quieras.",
+    "trustShort": "🔒 Solo tu círculo puede ver estos documentos."
   },
   "wall": {
     "title": "Muro familiar",

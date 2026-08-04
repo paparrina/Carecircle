@@ -69,6 +69,11 @@ export default async function LandingPage() {
       <p className="mt-auto pt-12 text-center text-[14px] leading-relaxed text-ink-secondary">
         {t("disclaimer")}
       </p>
+      <p className="mt-3 text-center text-[14px]">
+        <Link href="/legal" className="text-primary underline underline-offset-2">
+          Privacidad, cookies y condiciones
+        </Link>
+      </p>
     </main>
   );
 }

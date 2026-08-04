@@ -317,7 +317,9 @@
     "open": "Open",
     "delete": "Delete",
     "confirmDelete": "Delete \"{name}\"? This cannot be undone.",
-    "viewerNote": "Your role is view-only: you can open documents but not upload them."
+    "viewerNote": "Your role is view-only: you can open documents but not upload them.",
+    "trustNote": "🔒 Private and encrypted: only your circle's members can see this document. Stored on EU servers, and you can delete it anytime.",
+    "trustShort": "🔒 Only your circle can see these documents."
   },
   "wall": {
     "title": "Family wall",
