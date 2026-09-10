@@ -74,6 +74,10 @@ export function TodayDoseList({
             });
           }
         );
+      } else if (res.error === "conflict") {
+        showToast(t("alreadyLogged"));
+      } else if (res.error) {
+        showToast(t("genericError"));
       }
       router.refresh();
     });

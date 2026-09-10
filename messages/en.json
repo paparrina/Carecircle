@@ -144,6 +144,8 @@
     "doseSaved": "Dose logged",
     "doseSkipped": "Dose skipped",
     "doseUndone": "Log undone",
+    "alreadyLogged": "Someone else already logged it. Refreshing…",
+    "genericError": "Couldn't save. Please try again.",
     "inactive": "Paused",
     "responsible": "In charge: {name}",
     "schedules": "Schedule",

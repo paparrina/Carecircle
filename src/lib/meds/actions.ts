@@ -7,22 +7,58 @@ import { doseLogSchema, medicationSchema } from "@/lib/validators";
 
 export type MedFormState = { error?: string } | null;
 
+/**
+ * Actualiza los horarios de un medicamento sin perder el historial de tomas.
+ *
+ * Un horario que se borra y vuelve a crear cambia de id, y `medication_logs.schedule_id`
+ * tiene `on delete cascade`: borrar y recrear todos los horarios en cada edición
+ * (incluida una edición que solo cambia el nombre o la dosis) borraba también los
+ * registros de tomas ya hechas. En su lugar, se actualizan en el sitio los horarios
+ * cuya hora se mantiene, y solo se borran/crean los que realmente cambian de hora.
+ */
 async function saveSchedules(
   supabase: Awaited<ReturnType<typeof createClient>>,
   medicationId: string,
   times: string[],
   days: number[]
 ) {
-  await supabase
+  const { data: existing, error: fetchErr } = await supabase
     .from("medication_schedules")
-    .delete()
+    .select("id, time_of_day")
     .eq("medication_id", medicationId);
-  const rows = times.map((t) => ({
-    medication_id: medicationId,
-    time_of_day: t,
-    days_of_week: days
-  }));
-  return supabase.from("medication_schedules").insert(rows);
+  if (fetchErr) return { error: fetchErr };
+
+  const normalize = (t: string) => t.slice(0, 5);
+  const existingByTime = new Map(
+    (existing ?? []).map((s) => [normalize(s.time_of_day as string), s.id as string])
+  );
+  const nextTimes = new Set(times.map(normalize));
+
+  const idsToRemove = (existing ?? [])
+    .filter((s) => !nextTimes.has(normalize(s.time_of_day as string)))
+    .map((s) => s.id as string);
+  if (idsToRemove.length > 0) {
+    const { error } = await supabase
+      .from("medication_schedules")
+      .delete()
+      .in("id", idsToRemove);
+    if (error) return { error };
+  }
+
+  for (const t of times) {
+    const existingId = existingByTime.get(normalize(t));
+    const { error } = existingId
+      ? await supabase
+          .from("medication_schedules")
+          .update({ days_of_week: days })
+          .eq("id", existingId)
+      : await supabase
+          .from("medication_schedules")
+          .insert({ medication_id: medicationId, time_of_day: t, days_of_week: days });
+    if (error) return { error };
+  }
+
+  return { error: null };
 }
 
 function parseMedForm(formData: FormData) {
@@ -130,14 +166,23 @@ export async function deleteMedication(circleId: string, medicationId: string) {
   redirect(`/app/${circleId}/meds`);
 }
 
-/** Registra una toma (dada u omitida). Devuelve el id del log para poder deshacer. */
+/**
+ * Registra una toma (dada u omitida). Devuelve el id del log para poder deshacer.
+ *
+ * Antes usaba `upsert` sobre (schedule_id, due_date): si dos personas registraban la
+ * misma toma casi a la vez (o una pantalla desactualizada volvía a enviarla), la segunda
+ * escritura sobrescribía en silencio el autor y el estado de la primera, perdiendo el
+ * registro real de quién la dio. Ahora se inserta sin sobrescribir: si ya existe un
+ * registro para esa toma, se devuelve "conflict" para que la interfaz avise y refresque
+ * en vez de pisar el dato de otra persona.
+ */
 export async function logDose(input: {
   circleId: string;
   scheduleId: string;
   medicationId: string;
   dueDate: string;
   status: "taken" | "skipped";
-}): Promise<{ logId?: string; error?: string }> {
+}): Promise<{ logId?: string; error?: "invalid" | "auth" | "generic" | "conflict" }> {
   const parsed = doseLogSchema.safeParse(input);
   if (!parsed.success) return { error: "invalid" };
   const d = parsed.data;
@@ -150,21 +195,23 @@ export async function logDose(input: {
 
   const { data, error } = await supabase
     .from("medication_logs")
-    .upsert(
-      {
-        schedule_id: d.scheduleId,
-        medication_id: d.medicationId,
-        circle_id: d.circleId,
-        due_date: d.dueDate,
-        status: d.status,
-        logged_by: user.id,
-        logged_at: new Date().toISOString()
-      },
-      { onConflict: "schedule_id,due_date" }
-    )
+    .insert({
+      schedule_id: d.scheduleId,
+      medication_id: d.medicationId,
+      circle_id: d.circleId,
+      due_date: d.dueDate,
+      status: d.status,
+      logged_by: user.id,
+      logged_at: new Date().toISOString()
+    })
     .select("id")
     .single();
-  if (error || !data) return { error: "generic" };
+  if (error) {
+    // 23505 = unique_violation en (schedule_id, due_date): ya registrada por otra persona.
+    if (error.code === "23505") return { error: "conflict" };
+    return { error: "generic" };
+  }
+  if (!data) return { error: "generic" };
 
   revalidatePath(`/app/${d.circleId}`, "layout");
   return { logId: data.id };

@@ -26,7 +26,10 @@ export async function getTodayDoses(circleId: string): Promise<{
   const date = todayInCircleTZ();
   const weekday = weekdayInCircleTZ(date);
 
-  const [{ data: meds }, { data: logs }] = await Promise.all([
+  const [
+    { data: meds, error: medsErr },
+    { data: logs, error: logsErr }
+  ] = await Promise.all([
     supabase
       .from("medications")
       .select(
@@ -40,6 +43,11 @@ export async function getTodayDoses(circleId: string): Promise<{
       .eq("circle_id", circleId)
       .eq("due_date", date)
   ]);
+
+  // No tratar un fallo de lectura como "sin tomas registradas": eso haría parecer
+  // pendiente una toma que en realidad ya se dio, o vaciaría la lista del día.
+  if (medsErr) throw new Error(`getTodayDoses: fallo al leer medications (${medsErr.message})`);
+  if (logsErr) throw new Error(`getTodayDoses: fallo al leer medication_logs (${logsErr.message})`);
 
   const logBySchedule = new Map(
     (logs ?? []).map((l) => {
