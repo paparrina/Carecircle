@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MarkRead } from "@/components/shared/mark-read";
-import { useRelativeServer } from "@/components/shared/relative-server";
+import { getRelativeServer } from "@/components/shared/relative-server";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -35,7 +35,7 @@ export default async function NotificationsPage({
 }) {
   const { circleId } = await params;
   const t = await getTranslations("notif");
-  const rel = await useRelativeServer();
+  const rel = await getRelativeServer();
   const supabase = await createClient();
   const {
     data: { user }

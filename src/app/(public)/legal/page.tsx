@@ -173,7 +173,7 @@ export default function LegalPage() {
 
       <H3>3.3 Disponibilidad y cambios</H3>
       <P>
-        Prestamos el servicio "tal cual", con la máxima diligencia pero sin
+        Prestamos el servicio &ldquo;tal cual&rdquo;, con la máxima diligencia pero sin
         garantía de disponibilidad ininterrumpida. Podemos actualizar la app
         y estas condiciones; si el cambio es relevante, te avisaremos dentro
         de la aplicación. Puedes dejar de usar el servicio y borrar tus datos

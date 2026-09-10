@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-export async function useRelativeServer() {
+export async function getRelativeServer() {
   const t = await getTranslations("shell");
   return (iso: string) => {
     const diffMin = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
