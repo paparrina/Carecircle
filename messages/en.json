@@ -249,6 +249,7 @@
       "reminders": "Reminder",
       "r1440": "1 day before",
       "r60": "1 hour before",
+      "endBeforeStart": "End time must be after the start time.",
       "save": "Save event"
     }
   },
@@ -258,7 +259,7 @@
     "roleNames": {
       "coordinator": "Coordinator",
       "member": "Member",
-      "viewer": "Caregiver (view-only)"
+      "viewer": "Caregiver (limited access)"
     },
     "roleHints": {
       "coordinator": "Manages everything, including members and settings.",
@@ -294,7 +295,9 @@
     "signup": "Create account",
     "afterSignup": "After creating your account, open this link again to join.",
     "invalid": "This invitation is not valid or has expired.",
-    "askNew": "Ask your family member to send you a new one."
+    "askNew": "Ask your family member to send you a new one.",
+    "errorEmailMismatch": "This invitation was sent to a different email. Sign in with that account.",
+    "errorAlreadyUsed": "This invitation has already been used."
   },
   "docs": {
     "title": "Documents",

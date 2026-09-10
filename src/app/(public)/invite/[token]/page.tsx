@@ -14,11 +14,14 @@ type InviteInfo = {
 };
 
 export default async function InvitePage({
-  params
+  params,
+  searchParams
 }: {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { token } = await params;
+  const { error } = await searchParams;
   const t = await getTranslations("invitePage");
   const tm = await getTranslations("members");
   const supabase = await createClient();
@@ -61,6 +64,17 @@ export default async function InvitePage({
               role: tm(`roleNames.${invite.role ?? "member"}` as "roleNames.member")
             })}
           </p>
+
+          {error === "email_mismatch" && (
+            <p role="alert" className="mt-4 text-center text-[15px] font-medium text-danger">
+              {t("errorEmailMismatch")}
+            </p>
+          )}
+          {error === "already_used" && (
+            <p role="alert" className="mt-4 text-center text-[15px] font-medium text-danger">
+              {t("errorAlreadyUsed")}
+            </p>
+          )}
 
           <div className="mt-8 flex flex-col gap-3">
             {user ? (

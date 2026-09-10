@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,9 @@ import { Label } from "@/components/ui/label";
 import { GoogleIcon } from "@/components/shared/google-icon";
 import { loginWithGoogle, signup, type AuthState } from "@/lib/auth/actions";
 
-export default function SignupPage() {
+function SignupForm() {
   const t = useTranslations("auth");
+  const next = useSearchParams().get("next") ?? "/app";
   const [state, action, pending] = useActionState<AuthState, FormData>(
     signup,
     null
@@ -25,6 +27,7 @@ export default function SignupPage() {
       </h1>
 
       <form action={loginWithGoogle}>
+        <input type="hidden" name="next" value={next} />
         <Button type="submit" variant="secondary" size="lg">
           <GoogleIcon /> {t("google")}
         </Button>
@@ -36,6 +39,7 @@ export default function SignupPage() {
       </div>
 
       <form action={action} className="flex flex-col gap-4">
+        <input type="hidden" name="next" value={next} />
         <div>
           <Label htmlFor="fullName">{t("fullName")}</Label>
           <Input
@@ -88,12 +92,20 @@ export default function SignupPage() {
       <p className="mt-8 text-center text-[16px] text-ink-secondary">
         {t("hasAccount")}{" "}
         <Link
-          href="/login"
+          href={next === "/app" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
           className="font-medium text-primary underline underline-offset-2"
         >
           {t("goLogin")}
         </Link>
       </p>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   );
 }

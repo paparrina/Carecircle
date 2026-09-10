@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { markAllRead } from "@/lib/notifications/actions";
+import { markNotificationsRead } from "@/lib/notifications/actions";
 
-export function MarkRead({ circleId }: { circleId: string }) {
+/** `ids` debe ser exactamente el conjunto de avisos que la página ha renderizado. */
+export function MarkRead({ circleId, ids }: { circleId: string; ids: string[] }) {
   const done = useRef(false);
   useEffect(() => {
     if (done.current) return;
     done.current = true;
-    markAllRead(circleId);
-  }, [circleId]);
+    markNotificationsRead(circleId, ids);
+  }, [circleId, ids]);
   return null;
 }

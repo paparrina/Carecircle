@@ -41,8 +41,34 @@ export async function deletePost(
   postId: string
 ): Promise<{ error?: string }> {
   const supabase = await createClient();
+  const { data: post } = await supabase
+    .from("posts")
+    .select("attachments")
+    .eq("id", postId)
+    .eq("circle_id", circleId)
+    .maybeSingle();
+
   const { error } = await supabase.from("posts").delete().eq("id", postId);
   if (error) return { error: "generic" };
+
+  // Antes de esto, borrar un post no borraba nunca sus fotos: se quedaban
+  // huérfanas en Storage para siempre. Mejor esfuerzo: si falla, se registra
+  // pero no se deshace el borrado del post (ya no tiene fila que lo referencie).
+  const paths = ((post?.attachments ?? []) as { storage_path?: string }[])
+    .map((a) => a.storage_path)
+    .filter((p): p is string => Boolean(p));
+  if (paths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from("documents")
+      .remove(paths);
+    if (storageError) {
+      console.error(
+        `deletePost: no se pudieron borrar ${paths.length} adjunto(s) huérfano(s) del post ${postId}:`,
+        storageError.message
+      );
+    }
+  }
+
   revalidatePath(`/app/${circleId}/wall`);
   return {};
 }

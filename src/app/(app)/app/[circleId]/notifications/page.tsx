@@ -80,7 +80,7 @@ export default async function NotificationsPage({
 
   return (
     <div>
-      <MarkRead circleId={circleId} />
+      <MarkRead circleId={circleId} ids={(notifs ?? []).map((n) => n.id)} />
       <h1 className="mb-4 text-2xl font-semibold text-ink">{t("title")}</h1>
       {!notifs || notifs.length === 0 ? (
         <Card>

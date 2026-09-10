@@ -213,7 +213,7 @@ export function EventForm({
 
       {state?.error && (
         <p role="alert" className="text-[16px] font-medium text-danger">
-          {tc("errorGeneric")}
+          {state.error === "end_before_start" ? t("endBeforeStart") : tc("errorGeneric")}
         </p>
       )}
       <Button type="submit" size="lg" disabled={pending}>

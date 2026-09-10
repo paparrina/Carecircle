@@ -82,12 +82,20 @@ export async function deleteDocument(
     .maybeSingle();
   if (!doc) return { error: "not_found" };
 
+  // Borra primero el objeto de Storage y comprueba el resultado: antes se borraba
+  // la fila y luego el objeto sin mirar si esto último fallaba, dejando el archivo
+  // huérfano en Storage sin ninguna fila que lo referencie. Si el borrado del
+  // objeto falla, se conserva la fila para poder reintentarlo.
+  const { error: storageError } = await supabase.storage
+    .from("documents")
+    .remove([doc.storage_path]);
+  if (storageError) return { error: "generic" };
+
   const { error } = await supabase
     .from("documents")
     .delete()
     .eq("id", documentId);
   if (error) return { error: "generic" };
-  await supabase.storage.from("documents").remove([doc.storage_path]);
 
   revalidatePath(`/app/${circleId}/docs`);
   return {};
