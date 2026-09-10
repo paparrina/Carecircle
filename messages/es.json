@@ -144,6 +144,8 @@
     "doseSaved": "Toma registrada",
     "doseSkipped": "Toma omitida",
     "doseUndone": "Registro deshecho",
+    "alreadyLogged": "Ya la había registrado otra persona. Actualizando…",
+    "genericError": "No se pudo guardar. Inténtalo de nuevo.",
     "inactive": "Pausado",
     "responsible": "Se encarga: {name}",
     "schedules": "Horarios",
