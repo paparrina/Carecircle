@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "CareCircle",
+    "appName": "Zircol",
     "tagline": "Caring together, even from afar",
     "loading": "Loading…",
     "save": "Save",
@@ -21,10 +21,10 @@
     "point2Text": "Medical appointments and visits visible to the whole family, with reminders.",
     "point3Title": "Paperwork always at hand",
     "point3Text": "Reports, insurance and important documents, organized and protected.",
-    "disclaimer": "Cerca is a family organization tool. It does not provide medical advice or replace healthcare professionals. In an emergency, call 112."
+    "disclaimer": "Zircol is a family organization tool. It does not provide medical advice or replace healthcare professionals. In an emergency, call 112."
   },
   "auth": {
-    "loginTitle": "Sign in to Cerca",
+    "loginTitle": "Sign in to Zircol",
     "signupTitle": "Create account",
     "email": "Email",
     "password": "Password",
@@ -50,7 +50,7 @@
     "nameLabel": "Their name",
     "namePlaceholder": "For example: Carmen",
     "birthLabel": "Year of birth (optional)",
-    "consent": "I confirm I have this person's consent (or I am their legal representative) to manage their information in Cerca.",
+    "consent": "I confirm I have this person's consent (or I am their legal representative) to manage their information in Zircol.",
     "create": "Create their circle",
     "creating": "Creating…"
   },
@@ -286,7 +286,7 @@
     "waMessage": "Hi 👋 I've set up a space to organize {name}'s care: medication, appointments and paperwork in one place. Join here: {url}"
   },
   "invitePage": {
-    "title": "CareCircle invitation",
+    "title": "Zircol invitation",
     "text": "{inviter} invites you to join {recipient}'s care circle.",
     "asRole": "You'll join as: {role}",
     "join": "Join the circle",

@@ -56,7 +56,7 @@ export async function createInvitation(input: {
     ]);
     const { sent } = await sendEmail({
       to: parsed.data.email,
-      subject: `${profile?.full_name ?? "Un familiar"} te invita a CareCircle`,
+      subject: `${profile?.full_name ?? "Un familiar"} te invita a Zircol`,
       html: inviteEmailHtml({
         inviterName: profile?.full_name ?? "Un familiar",
         recipientName: recipient?.full_name ?? "",

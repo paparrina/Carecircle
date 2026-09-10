@@ -1,4 +1,4 @@
-/* Página legal de CareCircle: privacidad + cookies + términos.
+/* Página legal de Zircol: privacidad + cookies + términos.
    PLANTILLA seria adaptada a la app. Antes del lanzamiento comercial,
    revísala con un abogado y rellena los datos del responsable. */
 
@@ -38,7 +38,7 @@ export default function LegalPage() {
           En resumen (versión humana)
         </h2>
         <P>
-          CareCircle existe para que tu familia se organice, no para explotar
+          Zircol existe para que tu familia se organice, no para explotar
           tus datos. Los datos de la persona que cuidáis solo los ve su
           círculo. Todo se guarda cifrado en servidores de la Unión Europea.
           No vendemos datos, no hay publicidad y no usamos cookies de rastreo
@@ -51,13 +51,13 @@ export default function LegalPage() {
 
       <H3>1.1 Responsable del tratamiento</H3>
       <P>
-        [NOMBRE Y APELLIDOS / RAZÓN SOCIAL], con domicilio en [DIRECCIÓN] y
-        correo de contacto para privacidad:{" "}
+        Bartolomé Capella Cirer, con domicilio en C/ Vicari Calafat 16, 07199 Palma
+        (Illes Balears) y correo de contacto para privacidad:{" "}
         <a
           className="text-primary underline"
-          href="mailto:privacidad@ejemplo.com"
+          href="mailto:mrtomeucapella@gmail.com"
         >
-          privacidad@ejemplo.com
+          mrtomeucapella@gmail.com
         </a>
         .
       </P>
@@ -150,9 +150,9 @@ export default function LegalPage() {
 
       <H2>3. Condiciones de uso</H2>
 
-      <H3>3.1 Qué es CareCircle (y qué no es)</H3>
+      <H3>3.1 Qué es Zircol (y qué no es)</H3>
       <P>
-        CareCircle es una herramienta de organización familiar. No es un
+        Zircol es una herramienta de organización familiar. No es un
         producto sanitario, no ofrece consejo médico y no sustituye a
         profesionales de la salud ni a servicios de emergencia. Los
         recordatorios son una ayuda y pueden fallar o retrasarse: la
@@ -187,7 +187,7 @@ export default function LegalPage() {
       </P>
 
       <p className="mt-12 rounded-md bg-warning-soft p-4 text-[14px] leading-relaxed text-ink">
-        ⚠️ Nota interna: este texto es una plantilla adaptada a CareCircle
+        ⚠️ Nota interna: este texto es una plantilla adaptada a Zircol
         para la fase de piloto. Antes del lanzamiento comercial, hazla
         revisar por un profesional y completa los datos del responsable
         (punto 1.1). Elimina este aviso al hacerlo.

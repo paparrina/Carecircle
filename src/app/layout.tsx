@@ -6,7 +6,7 @@ import "./globals.css";
 import { SwRegister } from "@/components/shared/sw-register";
 
 export const metadata: Metadata = {
-  title: "CareCircle — Cuidar juntos, aunque estemos lejos",
+  title: "Zircol — Cuidar juntos, aunque estemos lejos",
   description:
     "Coordinación familiar del cuidado de personas mayores: medicación, citas, documentos y avisos en un solo lugar.",
   manifest: "/manifest.webmanifest"
