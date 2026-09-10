@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-/** Design tokens de Cerca — ver plan MVP §8 */
+/** Design tokens de Zircol — ver plan MVP §8 */
 export default {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {

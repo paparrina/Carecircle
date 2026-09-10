@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  const from = Deno.env.get("EMAIL_FROM") ?? "CareCircle <onboarding@resend.dev>";
+  const from = Deno.env.get("EMAIL_FROM") ?? "Zircol <onboarding@resend.dev>";
   if (!resendKey) return new Response("RESEND_API_KEY missing", { status: 200 });
 
   const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
       const email = u?.user?.email;
       if (!email) continue;
       const p = (n.payload ?? {}) as Record<string, string>;
-      const subject = SUBJECTS[n.type]?.(p) ?? "Novedades en CareCircle";
+      const subject = SUBJECTS[n.type]?.(p) ?? "Novedades en Zircol";
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
           subject,
           html: `<div style="font-family:system-ui;padding:24px">
             <h2 style="color:#1F2933">${subject}</h2>
-            <p style="color:#52606D">Abre CareCircle para ver los detalles.</p></div>`
+            <p style="color:#52606D">Abre Zircol para ver los detalles.</p></div>`
         })
       });
       // Antes se marcaba email_sent_at pasara lo que pasara, incluido un 4xx/5xx de

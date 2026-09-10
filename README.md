@@ -1,10 +1,10 @@
-# CareCircle — MVP completo (Tareas 1–9)
+# Zircol — MVP completo (Tareas 1–9)
 
 PWA de coordinación familiar de cuidados de personas mayores.
 **Cuidar juntos, aunque estemos lejos.**
 
 ## Qué incluye la Tarea 1
-- Next.js 15 (App Router) + TypeScript estricto + Tailwind (design tokens de Cerca)
+- Next.js 15 (App Router) + TypeScript estricto + Tailwind (design tokens de Zircol)
 - Migración completa de Supabase: 17 tablas, funciones de rol, RLS en todo, bucket privado `documents`
 - Auth: email+contraseña, magic link, Google OAuth, middleware de protección
 - Flujo: registro → "¿A quién vas a cuidar?" → círculo creado → dashboard "Hoy"
@@ -89,7 +89,7 @@ Ajustes y Notificaciones muestran un placeholder con la tarea en la que se activ
 **Variables nuevas en `.env.local` (opcionales):**
 ```
 RESEND_API_KEY=re_...
-EMAIL_FROM="CareCircle <hola@tudominio.com>"
+EMAIL_FROM="Zircol <hola@tudominio.com>"
 ```
 
 ## Qué incluye la Tarea 6 (Documentos)

@@ -7,7 +7,7 @@ export async function sendEmail(opts: {
   html: string;
 }): Promise<{ sent: boolean }> {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM ?? "CareCircle <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM ?? "Zircol <onboarding@resend.dev>";
   if (!key) return { sent: false };
 
   const res = await fetch("https://api.resend.com/emails", {
@@ -45,7 +45,7 @@ export function inviteEmailHtml(p: {
   const recipientName = escapeHtml(p.recipientName);
   return `<!doctype html><html><body style="font-family:system-ui,sans-serif;background:#F7FAFB;padding:24px">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:32px;border:1px solid #E4E0DA">
-    <h1 style="color:#1F2933;font-size:22px;margin:0 0 12px">Te han invitado a CareCircle</h1>
+    <h1 style="color:#1F2933;font-size:22px;margin:0 0 12px">Te han invitado a Zircol</h1>
     <p style="color:#52606D;font-size:16px;line-height:1.6;margin:0 0 20px">
       <b>${inviterName}</b> te invita a unirte al círculo de cuidado de
       <b>${recipientName}</b>: medicación, citas médicas, documentos y avisos

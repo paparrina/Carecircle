@@ -1,11 +1,13 @@
-# CareCircle — Guía de despliegue a producción
+# Zircol — Guía de despliegue a producción
 
 ## 1. Supabase (backend)
 1. Crea el proyecto en https://supabase.com → **región `eu-central-1` (Frankfurt)**.
 2. SQL Editor → ejecuta en orden: `0001_init.sql`, `0002_meds_profile.sql`,
-   `0003_invitations.sql`, `0004_notifications.sql`.
+   `0003_invitations.sql`, `0004_notifications.sql`, `0005_p0_fixes.sql`,
+   `0006_more_fixes.sql`.
 3. Verifica el cron: Database → Cron Jobs → debe existir
-   `carecircle-notification-sweep` (*/5). Si no, actívalo ahí apuntando a
+   `carecircle-notification-sweep` (*/5; el nombre interno del job no cambia
+   aunque la app se llame Zircol). Si no, actívalo ahí apuntando a
    `select public.run_notification_sweep();`
 4. Authentication → Providers: **Email** (confirmación activada) y **Google**
    (Client ID/Secret de Google Cloud Console; redirect URI:
@@ -16,18 +18,23 @@
 
 ## 2. Resend (email)
 1. Crea cuenta en https://resend.com, verifica tu dominio y genera la API key.
-2. Guarda `RESEND_API_KEY` y `EMAIL_FROM` (p. ej. `CareCircle <hola@tudominio.com>`).
+2. Guarda `RESEND_API_KEY` y `EMAIL_FROM` (p. ej. `Zircol <hola@tudominio.com>`).
+3. Genera un secreto aleatorio para `CRON_SECRET` (por ejemplo con
+   `openssl rand -hex 32`): protege el edge function de emails para que solo
+   lo pueda invocar el programador, no cualquiera con la clave anon.
 
 ## 3. Edge Function de emails
 ```bash
 npm i -g supabase
 supabase login
 supabase link --project-ref TU-REF
-supabase secrets set RESEND_API_KEY=re_xxx EMAIL_FROM="CareCircle <hola@tudominio.com>"
+supabase secrets set RESEND_API_KEY=re_xxx EMAIL_FROM="Zircol <hola@tudominio.com>" CRON_SECRET=el-mismo-secreto-del-paso-2.3
 supabase functions deploy notify-email
 ```
 Prográmala cada 5 min: Dashboard → Edge Functions → notify-email → Schedules
-→ cron `*/5 * * * *`.
+→ cron `*/5 * * * *`, con la cabecera `x-cron-secret: el-mismo-secreto-del-paso-2.3`
+en la petición programada (si el programador no permite cabeceras
+personalizadas, usa pg_cron + pg_net desde la base de datos en su lugar).
 
 ## 4. Vercel (frontend)
 1. Sube el repo a GitHub e importa en https://vercel.com.

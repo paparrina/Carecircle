@@ -1,5 +1,5 @@
-// CareCircle service worker — instalación PWA + estáticos + fallback offline
-const CACHE = "carecircle-v1";
+// Zircol service worker — instalación PWA + estáticos + fallback offline
+const CACHE = "zircol-v1";
 const PRECACHE = ["/offline.html", "/manifest.webmanifest", "/icons/icon-192.png"];
 
 self.addEventListener("install", (e) => {
