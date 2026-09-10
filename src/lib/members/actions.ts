@@ -95,7 +95,9 @@ export async function updateMemberRole(input: {
   if (!parsed.success) return { error: "invalid" };
   const supabase = await createClient();
 
-  // Nunca dejar el círculo sin coordinador
+  // Comprobación temprana para un buen mensaje; la garantía real (atómica,
+  // inmune a condiciones de carrera o a llamar la API directamente) la impone
+  // el trigger circle_members_prevent_zero_coordinators en la base de datos.
   const { data: target } = await supabase
     .from("circle_members")
     .select("role")
@@ -113,7 +115,12 @@ export async function updateMemberRole(input: {
     .from("circle_members")
     .update({ role: parsed.data.role })
     .eq("id", parsed.data.memberRowId);
-  if (error) return { error: "generic" };
+  if (error) {
+    if (error.message?.includes("circle_requires_at_least_one_coordinator")) {
+      return { error: "last_coordinator" };
+    }
+    return { error: "generic" };
+  }
 
   revalidatePath(`/app/${parsed.data.circleId}`, "layout");
   return {};
@@ -126,7 +133,7 @@ export async function removeMember(
   const supabase = await createClient();
   const { data: target } = await supabase
     .from("circle_members")
-    .select("role")
+    .select("role, user_id")
     .eq("id", memberRowId)
     .maybeSingle();
   if (
@@ -139,7 +146,31 @@ export async function removeMember(
     .from("circle_members")
     .delete()
     .eq("id", memberRowId);
-  if (error) return { error: "generic" };
+  if (error) {
+    if (error.message?.includes("circle_requires_at_least_one_coordinator")) {
+      return { error: "last_coordinator" };
+    }
+    return { error: "generic" };
+  }
+
+  // Reasignar lo que tenía a su cargo: sin esto, la agenda/medicación seguía
+  // mostrando como responsable a alguien que ya no está en el círculo.
+  if (target?.user_id) {
+    await Promise.all([
+      supabase
+        .from("medications")
+        .update({ assigned_to: null })
+        .eq("circle_id", circleId)
+        .eq("assigned_to", target.user_id),
+      supabase
+        .from("events")
+        .update({ assigned_to: null })
+        .eq("circle_id", circleId)
+        .eq("assigned_to", target.user_id)
+        .is("completed_at", null)
+    ]);
+  }
+
   revalidatePath(`/app/${circleId}`, "layout");
   return {};
 }
@@ -149,7 +180,14 @@ export async function acceptInvitation(token: string) {
   const { data: circleId, error } = await supabase.rpc("accept_invitation", {
     p_token: token
   });
-  if (error || !circleId) redirect(`/invite/${token}?error=1`);
+  if (error || !circleId) {
+    const code = error?.message?.includes("invitation_email_mismatch")
+      ? "email_mismatch"
+      : error?.message?.includes("invitation_already_used")
+        ? "already_used"
+        : "invalid";
+    redirect(`/invite/${token}?error=${code}`);
+  }
   revalidatePath("/app", "layout");
   redirect(`/app/${circleId}/home`);
 }

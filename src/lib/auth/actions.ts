@@ -4,9 +4,15 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, magicLinkSchema, signupSchema } from "@/lib/validators";
+import { safeNextPath } from "@/lib/auth/safe-redirect";
 
 function siteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+}
+
+/** URL de retorno tras el intercambio de código, con el destino (?next=) ya validado. */
+function callbackUrl(next: string) {
+  return `${siteUrl()}/auth/callback?next=${encodeURIComponent(safeNextPath(next))}`;
 }
 
 export type AuthState = { error?: string; message?: string } | null;
@@ -26,7 +32,7 @@ export async function loginWithPassword(
   if (error) return { error: "credentials" };
 
   revalidatePath("/", "layout");
-  redirect((formData.get("next") as string) || "/app");
+  redirect(safeNextPath(formData.get("next") as string));
 }
 
 export async function signup(
@@ -46,7 +52,7 @@ export async function signup(
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.fullName },
-      emailRedirectTo: `${siteUrl()}/auth/callback`
+      emailRedirectTo: callbackUrl(formData.get("next") as string)
     }
   });
   if (error) return { error: "generic" };
@@ -63,17 +69,17 @@ export async function sendMagicLink(
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
-    options: { emailRedirectTo: `${siteUrl()}/auth/callback` }
+    options: { emailRedirectTo: callbackUrl(formData.get("next") as string) }
   });
   if (error) return { error: "generic" };
   return { message: "magicLinkSent" };
 }
 
-export async function loginWithGoogle() {
+export async function loginWithGoogle(formData: FormData) {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${siteUrl()}/auth/callback` }
+    options: { redirectTo: callbackUrl(formData.get("next") as string) }
   });
   if (error || !data.url) redirect("/login?error=oauth");
   redirect(data.url);

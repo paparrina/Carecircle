@@ -37,6 +37,7 @@ function LoginForm() {
       </h1>
 
       <form action={loginWithGoogle}>
+        <input type="hidden" name="next" value={next} />
         <Button type="submit" variant="secondary" size="lg">
           <GoogleIcon /> {t("google")}
         </Button>
@@ -82,6 +83,7 @@ function LoginForm() {
       <form action={mlAction} className="mt-4">
         {/* Reutiliza el email escrito arriba mediante FormData del propio form */}
         <input type="hidden" name="email" id="ml-email" />
+        <input type="hidden" name="next" value={next} />
         <Button
           type="submit"
           variant="ghost"
@@ -117,7 +119,7 @@ function LoginForm() {
       <p className="mt-8 text-center text-[16px] text-ink-secondary">
         {t("noAccount")}{" "}
         <Link
-          href="/signup"
+          href={next === "/app" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
           className="font-medium text-primary underline underline-offset-2"
         >
           {t("goSignup")}

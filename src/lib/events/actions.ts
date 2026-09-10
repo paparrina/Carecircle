@@ -37,6 +37,11 @@ function toRow(d: ReturnType<typeof parseEventForm>["data"] & object) {
   };
 }
 
+/** No se comprobaba que la hora de fin fuera posterior a la de inicio. */
+function endsBeforeStarts(row: { starts_at: string; ends_at: string | null }) {
+  return row.ends_at !== null && new Date(row.ends_at) <= new Date(row.starts_at);
+}
+
 export async function createEvent(
   _prev: EventFormState,
   formData: FormData
@@ -50,10 +55,13 @@ export async function createEvent(
   } = await supabase.auth.getUser();
   if (!user) return { error: "auth" };
 
+  const row = toRow(parsed.data);
+  if (endsBeforeStarts(row)) return { error: "end_before_start" };
+
   const { error } = await supabase.from("events").insert({
     circle_id: parsed.data.circleId,
     created_by: user.id,
-    ...toRow(parsed.data)
+    ...row
   });
   if (error) return { error: "generic" };
 
@@ -69,10 +77,13 @@ export async function updateEvent(
   const parsed = parseEventForm(formData);
   if (!parsed.success) return { error: "invalid" };
 
+  const row = toRow(parsed.data);
+  if (endsBeforeStarts(row)) return { error: "end_before_start" };
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("events")
-    .update(toRow(parsed.data))
+    .update(row)
     .eq("id", eventId);
   if (error) return { error: "generic" };
 

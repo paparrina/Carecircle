@@ -249,6 +249,7 @@
       "reminders": "Recordatorio",
       "r1440": "1 día antes",
       "r60": "1 hora antes",
+      "endBeforeStart": "La hora de fin debe ser posterior a la de inicio.",
       "save": "Guardar evento"
     }
   },
@@ -258,7 +259,7 @@
     "roleNames": {
       "coordinator": "Coordinador/a",
       "member": "Miembro",
-      "viewer": "Cuidador/a (solo lectura)"
+      "viewer": "Cuidador/a (acceso limitado)"
     },
     "roleHints": {
       "coordinator": "Gestiona todo, incluidos miembros y ajustes.",
@@ -294,7 +295,9 @@
     "signup": "Crear cuenta",
     "afterSignup": "Después de crear la cuenta, vuelve a abrir este enlace para unirte.",
     "invalid": "Esta invitación no es válida o ha caducado.",
-    "askNew": "Pide a tu familiar que te envíe una nueva."
+    "askNew": "Pide a tu familiar que te envíe una nueva.",
+    "errorEmailMismatch": "Esta invitación es para otra dirección de email. Entra con la cuenta a la que se envió.",
+    "errorAlreadyUsed": "Esta invitación ya se ha usado."
   },
   "docs": {
     "title": "Documentos",
