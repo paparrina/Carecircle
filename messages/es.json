@@ -328,6 +328,7 @@
     "uploadBtn": "Subir",
     "uploading": "Subiendo…",
     "uploaded": "Documento subido",
+    "invalidContent": "El contenido del archivo no coincide con su formato o el archivo está dañado.",
     "tooBig": "El archivo supera los 20 MB.",
     "uploadedBy": "{name} · {date}",
     "open": "Abrir",

@@ -1,4 +1,4 @@
--- Run in the test project or disposable PostgreSQL with migrations through 0017.
+-- Run in the test project or disposable PostgreSQL with migrations through 0018.
 begin;
 
 insert into auth.users (id, email) values
@@ -12,6 +12,12 @@ select 'documents', 'circles/00000000-0000-0000-0000-000000000042/' || path,
   '{"size":42,"mimetype":"application/pdf"}', now() - age
 from (values ('old.pdf', interval '25 hours'), ('fresh.pdf', interval '1 hour'),
   ('registered.pdf', interval '25 hours')) examples(path, age);
+
+update storage.objects set version='fixture-version'
+where name='circles/00000000-0000-0000-0000-000000000042/registered.pdf';
+insert into public.document_content_validations (storage_path,object_id,object_version,validated_by,expires_at)
+select name,id,version,'00000000-0000-0000-0000-000000000041',now()+interval '10 minutes'
+from storage.objects where name='circles/00000000-0000-0000-0000-000000000042/registered.pdf';
 
 set local role authenticated;
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-000000000041', true);

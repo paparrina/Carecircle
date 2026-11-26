@@ -328,6 +328,7 @@
     "uploadBtn": "Upload",
     "uploading": "Uploading…",
     "uploaded": "Document uploaded",
+    "invalidContent": "The file content does not match its format, or the file is damaged.",
     "tooBig": "The file exceeds 20 MB.",
     "uploadedBy": "{name} · {date}",
     "open": "Open",

@@ -114,6 +114,7 @@ export function DocsBrowser({
       });
       // A failed or interrupted registration may have committed. Leave its
       // object to the reconciler, which checks the persisted document first.
+      if (res.error === "invalid_content") return setMsg(t("invalidContent"));
       if (res.error) throw new Error(res.error);
       setUploadOpen(false);
       setFile(null);

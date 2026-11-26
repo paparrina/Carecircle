@@ -38,6 +38,11 @@ función actualizada. El mismo trabajo programado limpia hasta 50 archivos por
 ejecución del almacén de documentos cuando llevan al menos 24 horas sin ficha.
 La limpieza se ejecuta antes del envío de correos.
 
+Antes de activar `0018_require_validated_document_content.sql`, despliega
+`validate-document` en el mismo proyecto. Publica después la versión de la
+aplicación que lo invoca. La migración exige una validación para las nuevas fichas de documentos.
+
+
 ## 4. Vercel (frontend)
 1. Sube el repo a GitHub e importa en https://vercel.com.
 2. Variables de entorno (Production):

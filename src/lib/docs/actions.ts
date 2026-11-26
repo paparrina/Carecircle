@@ -32,6 +32,13 @@ export async function createDocumentRecord(
   } = await supabase.auth.getUser();
   if (!user) return { error: "auth" };
 
+  const { data: validation, error: validationError } =
+    await supabase.functions.invoke<{ valid: boolean }>("validate-document", {
+      body: { path: d.storagePath }
+    });
+  if (validationError || !validation) return { error: "generic" };
+  if (!validation.valid) return { error: "invalid_content" };
+
   const { error } = await supabase.from("documents").insert({
     circle_id: d.circleId,
     folder_id: d.folderId,

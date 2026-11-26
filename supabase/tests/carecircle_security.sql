@@ -1,4 +1,4 @@
--- Run on a disposable database with migrations through 0015, using the SQL editor
+-- Run on a disposable database with migrations through 0018, using the SQL editor
 -- or psql -v ON_ERROR_STOP=1. Fixtures and changes are rolled back.
 begin;
 insert into auth.users (id,email,email_confirmed_at) values
@@ -40,6 +40,12 @@ insert into storage.objects (bucket_id,name,metadata) values
  ('documents','circles/00000000-0000-0000-0000-000000000025/fixture.pdf','{"size":42,"mimetype":"application/pdf"}'),
  ('documents','circles/00000000-0000-0000-0000-000000000025/large.pdf','{"size":20971521,"mimetype":"application/pdf"}'),
  ('documents','circles/00000000-0000-0000-0000-000000000025/invalid.svg','{"size":42,"mimetype":"image/svg+xml"}');
+
+insert into public.document_content_validations (storage_path,object_id,object_version,validated_by,expires_at)
+select name,id,'fixture-version','00000000-0000-0000-0000-000000000021',now()+interval '10 minutes'
+from storage.objects where name='circles/00000000-0000-0000-0000-000000000025/fixture.pdf';
+update storage.objects set version='fixture-version'
+where name='circles/00000000-0000-0000-0000-000000000025/fixture.pdf';
 
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000021"}',true);
