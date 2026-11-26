@@ -10,7 +10,7 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const EMAIL_TYPES = ["event_reminder", "med_missed", "mention", "important_date"];
+type PendingEmail = { id: string; user_id: string; email_attempts: number };
 
 Deno.serve(async (req) => {
   const cronSecret = Deno.env.get("CRON_SECRET");
@@ -27,27 +27,21 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: notifs, error: queryError } = await supabase
-    .from("notifications")
-    .select("id, user_id")
-    .in("type", EMAIL_TYPES)
-    .is("email_sent_at", null)
-    .gte("created_at", since)
-    .limit(50);
+  const { data: notifs, error: queryError } = await supabase.rpc("pending_notification_emails");
 
   if (queryError) return new Response("Notification lookup failed", { status: 500 });
 
   let sent = 0;
   let failed = 0;
-  for (const n of notifs ?? []) {
+  for (const n of (notifs ?? []) as PendingEmail[]) {
     try {
-      const { data: u } = await supabase.auth.admin.getUserById(n.user_id);
+      const { data: u, error: userError } = await supabase.auth.admin.getUserById(n.user_id);
       const email = u?.user?.email;
-      if (!email) continue;
+      if (userError || !email) throw new Error("Missing recipient");
       const subject = "Tienes un aviso en CareCircle";
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
+        signal: AbortSignal.timeout(10000),
         headers: {
           Authorization: `Bearer ${resendKey}`,
           "Content-Type": "application/json",
@@ -62,28 +56,31 @@ Deno.serve(async (req) => {
             <p style="color:#52606D">Abre CareCircle para ver los detalles.</p></div>`
         })
       });
-      // Antes se marcaba email_sent_at pasara lo que pasara, incluido un 4xx/5xx de
-      // Resend: la notificación quedaba como "enviada" sin haberse entregado nunca, y
-      // no se reintentaba. Ahora solo se marca cuando Resend confirma éxito; si falla,
-      // la siguiente ejecución (dentro de la ventana de 1h) volverá a intentarlo.
-      if (res.ok) {
-        const { error: markError } = await supabase
-          .from("notifications")
-          .update({ email_sent_at: new Date().toISOString() })
-          .eq("id", n.id);
-        if (markError) throw new Error("Could not mark notification as sent");
-        sent++;
-      } else {
-        failed++;
-        console.error(
-          `notify-email: Resend rechazó el envío de la notificación ${n.id} (HTTP ${res.status})`
-        );
+      if (!res.ok) {
+        throw new Error(`Resend HTTP ${res.status}`);
       }
+      const { error: markError } = await supabase
+        .from("notifications")
+        .update({ email_sent_at: new Date().toISOString() })
+        .eq("id", n.id);
+      if (markError) throw new Error("Could not mark notification as sent");
+      sent++;
     } catch (err) {
       failed++;
-      console.error(`notify-email: fallo procesando la notificación ${n.id}:`, err);
+      const delayMinutes = 5 * 2 ** n.email_attempts;
+      const { error: retryError } = await supabase.from("notifications")
+        .update({
+          email_attempts: n.email_attempts + 1,
+          email_next_attempt_at: new Date(Date.now() + delayMinutes * 60000).toISOString()
+        })
+        .eq("id", n.id)
+        .eq("email_attempts", n.email_attempts)
+        .is("email_sent_at", null);
+      if (retryError) console.error("notify-email: could not schedule retry", n.id);
+      console.error("notify-email: send failed", n.id, err);
     }
   }
+
   return new Response(
     JSON.stringify({ processed: notifs?.length ?? 0, sent, failed }),
     { headers: { "Content-Type": "application/json" } }

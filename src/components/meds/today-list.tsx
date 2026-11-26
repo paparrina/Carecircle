@@ -7,6 +7,7 @@ import { Check, CircleAlert, Minus } from "lucide-react";
 import { logDose, undoDose } from "@/lib/meds/actions";
 import type { TodayDose } from "@/lib/meds/queries";
 import { cn } from "@/lib/utils";
+import { todayInCircleTZ } from "@/lib/dates";
 
 function nowHHMM() {
   return new Intl.DateTimeFormat("es-ES", {
@@ -90,7 +91,7 @@ export function TodayDoseList({
       minute: "2-digit"
     }).format(new Date(iso));
 
-  const isLate = (time: string) => !compact && time < nowHHMM();
+  const isLate = (time: string) => !compact && (date < todayInCircleTZ() || time < nowHHMM());
 
   return (
     <div className="relative">

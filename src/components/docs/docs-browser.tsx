@@ -289,7 +289,7 @@ export function DocsBrowser({
           <input
             ref={fileRef}
             type="file"
-            accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+            accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif,.doc,.docx,.xls,.xlsx"
             className="hidden"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />

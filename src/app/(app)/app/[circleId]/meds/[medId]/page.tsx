@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { lastNDates, weekdayInCircleTZ } from "@/lib/dates";
+import { lastNDates, madridToUTC, weekdayInCircleTZ } from "@/lib/dates";
 import { Card, CardTitle } from "@/components/ui/card";
 import { MedAdminButtons } from "@/components/meds/med-admin-buttons";
 import { cn } from "@/lib/utils";
@@ -22,11 +22,10 @@ export default async function MedDetailPage({
     supabase
       .from("medications")
       .select(
-        "id, name, dosage, instructions, active, archived_at, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week)"
+        "id, name, dosage, instructions, active, archived_at, created_at, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week, effective_at, retired_at)"
       )
       .eq("id", medId)
       .eq("circle_id", circleId)
-      .is("medication_schedules.retired_at", null)
       .maybeSingle(),
     supabase.auth.getUser().then(({ data: { user } }) =>
       supabase
@@ -42,13 +41,25 @@ export default async function MedDetailPage({
     membership?.role === "coordinator" || membership?.role === "member";
 
   const days7 = lastNDates(7);
-  const { data: logs } = await supabase
-    .from("medication_logs")
-    .select("due_date, status, schedule_id")
-    .eq("medication_id", medId)
-    .gte("due_date", days7[0]);
+  const [{ data: logs, error: logsError }, { data: corrections, error: correctionsError }] =
+    await Promise.all([
+      supabase.from("medication_logs").select("due_date, status, schedule_id")
+        .eq("medication_id", medId).gte("due_date", days7[0]),
+      supabase.from("medication_log_corrections")
+        .select("id, due_date, previous_status, corrected_status, corrected_at")
+        .eq("circle_id", circleId).eq("medication_id", medId)
+        .order("corrected_at", { ascending: false }).limit(20)
+    ]);
+  if (logsError || correctionsError) throw new Error("Could not read medication history");
+  const correctionStatus = (status: string | null) => {
+    if (status === "taken") return t("correctionTaken");
+    if (status === "skipped") return t("correctionSkipped");
+    if (status === "missed") return t("correctionMissed");
+    return t("correctionUndone");
+  };
 
-  const schedules = med.medication_schedules ?? [];
+  const versions = med.medication_schedules ?? [];
+  const schedules = versions.filter((schedule) => !schedule.retired_at);
   const assigned = Array.isArray(med.assigned) ? med.assigned[0] : med.assigned;
   const dayInitials = (await getTranslations("meds.form"))("dayInitials").split(
     ","
@@ -57,12 +68,16 @@ export default async function MedDetailPage({
   // Adherencia por día: verde = todas registradas, ámbar = parcial, gris = ninguna/sin tomas
   const dots = days7.map((date) => {
     const wd = weekdayInCircleTZ(date);
-    const dueCount = schedules.filter((s) =>
-      (s.days_of_week as number[]).includes(wd)
-    ).length;
-    const dayLogs = (logs ?? []).filter(
-      (l) => l.due_date === date && l.status === "taken"
-    ).length;
+    const recorded = (logs ?? []).filter((log) => log.due_date === date);
+    const dueCount = versions.filter((schedule) => {
+      if (recorded.some((log) => log.schedule_id === schedule.id)) return true;
+      if (!(schedule.days_of_week as number[]).includes(wd)) return false;
+      const due = Date.parse(madridToUTC(date, schedule.time_of_day.slice(0, 5)));
+      return due >= Date.parse(schedule.effective_at ?? med.created_at)
+        && (!schedule.retired_at || due < Date.parse(schedule.retired_at))
+        && (!med.archived_at || due < Date.parse(med.archived_at));
+    }).length;
+    const dayLogs = recorded.filter((log) => log.status === "taken").length;
     return {
       date,
       state:
@@ -162,6 +177,28 @@ export default async function MedDetailPage({
           ))}
         </div>
       </Card>
+
+      {!!corrections?.length && (
+        <Card>
+          <CardTitle>{t("correctionHistory")}</CardTitle>
+          <ul className="mt-2 divide-y divide-line">
+            {corrections.map((entry) => (
+              <li key={entry.id} className="py-2 text-sm">
+                <div>{t("correctionChange", {
+                  date: entry.due_date,
+                  before: correctionStatus(entry.previous_status),
+                  after: correctionStatus(entry.corrected_status)
+                })}</div>
+                <time dateTime={entry.corrected_at} className="text-ink-secondary">
+                  {new Intl.DateTimeFormat(locale, {
+                    timeZone: "Europe/Madrid", dateStyle: "short", timeStyle: "short"
+                  }).format(new Date(entry.corrected_at))}
+                </time>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {canEdit && !med.archived_at && (
         <MedAdminButtons

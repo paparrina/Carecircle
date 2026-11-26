@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { todayInCircleTZ, weekdayInCircleTZ } from "@/lib/dates";
+import { madridToUTC, todayInCircleTZ, weekdayInCircleTZ } from "@/lib/dates";
 
 export type TodayDose = {
   scheduleId: string;
@@ -18,12 +18,12 @@ export type TodayDose = {
 };
 
 /** Tomas de hoy del círculo, ordenadas por hora, con su registro si existe. */
-export async function getTodayDoses(circleId: string): Promise<{
+export async function getTodayDoses(circleId: string, requestedDate?: string): Promise<{
   date: string;
   doses: TodayDose[];
 }> {
   const supabase = await createClient();
-  const date = todayInCircleTZ();
+  const date = requestedDate ?? todayInCircleTZ();
   const weekday = weekdayInCircleTZ(date);
 
   const [
@@ -33,11 +33,10 @@ export async function getTodayDoses(circleId: string): Promise<{
     supabase
       .from("medications")
       .select(
-        "id, name, dosage, instructions, active, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week)"
+        "id, name, dosage, instructions, active, archived_at, created_at, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week, effective_at, retired_at)"
       )
       .eq("circle_id", circleId)
-      .is("medication_schedules.retired_at", null)
-      .eq("active", true),
+      .or("active.eq.true,archived_at.not.is.null"),
     supabase
       .from("medication_logs")
       .select("id, schedule_id, status, logged_at, by:logged_by(full_name)")
@@ -70,6 +69,14 @@ export async function getTodayDoses(circleId: string): Promise<{
     const assigned = Array.isArray(m.assigned) ? m.assigned[0] : m.assigned;
     for (const s of m.medication_schedules ?? []) {
       if (!(s.days_of_week as number[]).includes(weekday)) continue;
+      const due = Date.parse(madridToUTC(date, s.time_of_day.slice(0, 5)));
+      const starts = Date.parse(s.effective_at ?? m.created_at);
+      const ends = Math.min(
+        s.retired_at ? Date.parse(s.retired_at) : Infinity,
+        m.archived_at ? Date.parse(m.archived_at) : Infinity
+      );
+      const log = logBySchedule.get(s.id) ?? null;
+      if (!log && (due < starts || due >= ends)) continue;
       doses.push({
         scheduleId: s.id,
         medicationId: m.id,
@@ -78,7 +85,7 @@ export async function getTodayDoses(circleId: string): Promise<{
         dosage: m.dosage,
         instructions: m.instructions,
         assignedName: assigned?.full_name?.split(" ")[0] ?? null,
-        log: logBySchedule.get(s.id) ?? null
+        log
       });
     }
   }

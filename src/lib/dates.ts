@@ -22,20 +22,10 @@ export function weekdayInCircleTZ(dateISO?: string): number {
 }
 
 export function lastNDates(n: number): string[] {
-  const out: string[] = [];
-  const now = new Date();
-  for (let i = 0; i < n; i++) {
-    const d = new Date(now.getTime() - i * 86400000);
-    out.push(
-      new Intl.DateTimeFormat("en-CA", {
-        timeZone: CIRCLE_TZ,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-      }).format(d)
-    );
-  }
-  return out.reverse();
+  const midnight = Date.parse(`${todayInCircleTZ()}T00:00:00Z`);
+  return Array.from({ length: n }, (_, index) =>
+    new Date(midnight - (n - index - 1) * 86400000).toISOString().slice(0, 10)
+  );
 }
 
 /** Offset (min) de Europe/Madrid respecto a UTC en un instante dado. */
@@ -59,7 +49,7 @@ function madridOffsetMin(at: Date): number {
     +parts.hour === 24 ? 0 : +parts.hour,
     +parts.minute
   );
-  return (asUTC - at.getTime()) / 60000;
+  return (asUTC - Math.floor(at.getTime() / 60000) * 60000) / 60000;
 }
 
 /** Convierte fecha+hora local de Madrid a ISO UTC (timestamptz). */

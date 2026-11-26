@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Pill, Plus, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTodayDoses } from "@/lib/meds/queries";
+import { lastNDates } from "@/lib/dates";
 import { TodayDoseList } from "@/components/meds/today-list";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -55,7 +56,12 @@ export default async function MedsPage({
   );
 
   if (!showAll) {
-    const { date, doses } = await getTodayDoses(circleId);
+    const [yesterday] = lastNDates(2);
+    const [{ date, doses }, previous] = await Promise.all([
+      getTodayDoses(circleId),
+      getTodayDoses(circleId, yesterday)
+    ]);
+    const previousPending = previous.doses.filter((dose) => !dose.log);
     const done = doses.filter((d) => d.log).length;
     return (
       <div>
@@ -89,6 +95,12 @@ export default async function MedsPage({
             </>
           )}
         </Card>
+        {previousPending.length > 0 && (
+          <Card className="mt-3">
+            <h2 className="text-[15px] font-semibold">{t("pendingYesterday")}</h2>
+            <TodayDoseList circleId={circleId} date={yesterday} doses={previousPending} />
+          </Card>
+        )}
         {addFab}
       </div>
     );
