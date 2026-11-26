@@ -7,60 +7,6 @@ import { doseLogSchema, medicationSchema } from "@/lib/validators";
 
 export type MedFormState = { error?: string } | null;
 
-/**
- * Actualiza los horarios de un medicamento sin perder el historial de tomas.
- *
- * Un horario que se borra y vuelve a crear cambia de id, y `medication_logs.schedule_id`
- * tiene `on delete cascade`: borrar y recrear todos los horarios en cada edición
- * (incluida una edición que solo cambia el nombre o la dosis) borraba también los
- * registros de tomas ya hechas. En su lugar, se actualizan en el sitio los horarios
- * cuya hora se mantiene, y solo se borran/crean los que realmente cambian de hora.
- */
-async function saveSchedules(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  medicationId: string,
-  times: string[],
-  days: number[]
-) {
-  const { data: existing, error: fetchErr } = await supabase
-    .from("medication_schedules")
-    .select("id, time_of_day")
-    .eq("medication_id", medicationId);
-  if (fetchErr) return { error: fetchErr };
-
-  const normalize = (t: string) => t.slice(0, 5);
-  const existingByTime = new Map(
-    (existing ?? []).map((s) => [normalize(s.time_of_day as string), s.id as string])
-  );
-  const nextTimes = new Set(times.map(normalize));
-
-  const idsToRemove = (existing ?? [])
-    .filter((s) => !nextTimes.has(normalize(s.time_of_day as string)))
-    .map((s) => s.id as string);
-  if (idsToRemove.length > 0) {
-    const { error } = await supabase
-      .from("medication_schedules")
-      .delete()
-      .in("id", idsToRemove);
-    if (error) return { error };
-  }
-
-  for (const t of times) {
-    const existingId = existingByTime.get(normalize(t));
-    const { error } = existingId
-      ? await supabase
-          .from("medication_schedules")
-          .update({ days_of_week: days })
-          .eq("id", existingId)
-      : await supabase
-          .from("medication_schedules")
-          .insert({ medication_id: medicationId, time_of_day: t, days_of_week: days });
-    if (error) return { error };
-  }
-
-  return { error: null };
-}
-
 function parseMedForm(formData: FormData) {
   return medicationSchema.safeParse({
     circleId: formData.get("circleId"),
@@ -73,8 +19,8 @@ function parseMedForm(formData: FormData) {
   });
 }
 
-export async function createMedication(
-  _prev: MedFormState,
+async function saveMedication(
+  medicationId: string | null,
   formData: FormData
 ): Promise<MedFormState> {
   const parsed = parseMedForm(formData);
@@ -82,35 +28,27 @@ export async function createMedication(
   const d = parsed.data;
 
   const supabase = await createClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "auth" };
-
-  const { data: med, error } = await supabase
-    .from("medications")
-    .insert({
-      circle_id: d.circleId,
-      name: d.name,
-      dosage: d.dosage,
-      instructions: d.instructions || null,
-      assigned_to: d.assignedTo || null,
-      created_by: user.id
-    })
-    .select("id")
-    .single();
-  if (error || !med) return { error: "generic" };
-
-  const { error: schedErr } = await saveSchedules(
-    supabase,
-    med.id,
-    d.times,
-    d.days
-  );
-  if (schedErr) return { error: "generic" };
+  const { data: savedId, error } = await supabase.rpc("save_medication_with_schedules", {
+    p_circle_id: d.circleId,
+    p_medication_id: medicationId,
+    p_name: d.name,
+    p_dosage: d.dosage,
+    p_instructions: d.instructions || null,
+    p_assigned_to: d.assignedTo || null,
+    p_times: d.times,
+    p_days: d.days
+  });
+  if (error || !savedId) return { error: "generic" };
 
   revalidatePath(`/app/${d.circleId}`, "layout");
-  redirect(`/app/${d.circleId}/meds`);
+  redirect(medicationId ? `/app/${d.circleId}/meds/${savedId}` : `/app/${d.circleId}/meds`);
+}
+
+export async function createMedication(
+  _prev: MedFormState,
+  formData: FormData
+): Promise<MedFormState> {
+  return saveMedication(null, formData);
 }
 
 export async function updateMedication(
@@ -118,32 +56,7 @@ export async function updateMedication(
   _prev: MedFormState,
   formData: FormData
 ): Promise<MedFormState> {
-  const parsed = parseMedForm(formData);
-  if (!parsed.success) return { error: "invalid" };
-  const d = parsed.data;
-
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("medications")
-    .update({
-      name: d.name,
-      dosage: d.dosage,
-      instructions: d.instructions || null,
-      assigned_to: d.assignedTo || null
-    })
-    .eq("id", medicationId);
-  if (error) return { error: "generic" };
-
-  const { error: schedErr } = await saveSchedules(
-    supabase,
-    medicationId,
-    d.times,
-    d.days
-  );
-  if (schedErr) return { error: "generic" };
-
-  revalidatePath(`/app/${d.circleId}`, "layout");
-  redirect(`/app/${d.circleId}/meds/${medicationId}`);
+  return saveMedication(medicationId, formData);
 }
 
 export async function setMedicationActive(
@@ -155,15 +68,25 @@ export async function setMedicationActive(
   await supabase
     .from("medications")
     .update({ active })
-    .eq("id", medicationId);
+    .eq("id", medicationId)
+    .eq("circle_id", circleId)
+    .is("archived_at", null);
   revalidatePath(`/app/${circleId}`, "layout");
 }
 
-export async function deleteMedication(circleId: string, medicationId: string) {
+export async function archiveMedication(circleId: string, medicationId: string) {
   const supabase = await createClient();
-  await supabase.from("medications").delete().eq("id", medicationId);
+  const { data, error } = await supabase
+    .from("medications")
+    .update({ active: false, archived_at: new Date().toISOString() })
+    .eq("id", medicationId)
+    .eq("circle_id", circleId)
+    .is("archived_at", null)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return { error: "generic" };
   revalidatePath(`/app/${circleId}`, "layout");
-  redirect(`/app/${circleId}/meds`);
+  redirect(`/app/${circleId}/meds?tab=all`);
 }
 
 /**

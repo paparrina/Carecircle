@@ -21,6 +21,8 @@ export default async function EditMedPage({
       )
       .eq("id", medId)
       .eq("circle_id", circleId)
+      .is("medication_schedules.retired_at", null)
+      .is("archived_at", null)
       .maybeSingle(),
     supabase
       .from("circle_members")

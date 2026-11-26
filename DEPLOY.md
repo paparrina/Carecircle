@@ -3,7 +3,12 @@
 ## 1. Supabase (backend)
 1. Crea el proyecto en https://supabase.com → **región `eu-central-1` (Frankfurt)**.
 2. SQL Editor → ejecuta en orden: `0001_init.sql`, `0002_meds_profile.sql`,
-   `0003_invitations.sql`, `0004_notifications.sql`.
+   `0003_invitations.sql`, `0004_notifications.sql`, `0005_p0_fixes.sql`,
+   `0006_more_fixes.sql`, `0007_protect_documents_and_medication_history.sql`.
+   En una base existente, comprueba primero qué cambios están activos. Antes de
+   aplicar `0007`, revisa las fichas con rutas de archivo duplicadas, fuera de su
+   círculo o en carpetas de otro círculo. La migración se revierte si encuentra
+   alguna de estas inconsistencias.
 3. Verifica el cron: Database → Cron Jobs → debe existir
    `carecircle-notification-sweep` (*/5). Si no, actívalo ahí apuntando a
    `select public.run_notification_sweep();`
@@ -45,7 +50,7 @@ Prográmala cada 5 min: Dashboard → Edge Functions → notify-email → Schedu
 - [ ] Copiar enlace de invitación → abrirlo en incógnito → unirse como Cuidador/a
 - [ ] Marcar una toma desde la cuenta invitada → aparece "Registrada por…"
 - [ ] Dejar una toma sin marcar 45 min → llega la notificación (campana)
-- [ ] Subir documento sensible → comprobar que el rol Cuidador/a NO lo ve
+- [ ] Subir documento sensible → comprobar que el rol Lector/a no puede ver ni descargar el archivo
 - [ ] Instalar la PWA en un Android real (menú → Añadir a pantalla de inicio)
 - [ ] Modo avión → la app muestra la página sin conexión
 

@@ -125,6 +125,10 @@
     "text": "Final legal texts will be added before launch."
   },
   "meds": {
+    "archived": "Archived",
+    "archive": "Archive",
+    "confirmArchive": "Archive this medication? Its dose history will be kept.",
+    "archiveError": "Could not archive this medication.",
     "title": "Medication",
     "tabToday": "Today",
     "tabAll": "All",

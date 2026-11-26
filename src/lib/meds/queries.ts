@@ -36,6 +36,7 @@ export async function getTodayDoses(circleId: string): Promise<{
         "id, name, dosage, instructions, active, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week)"
       )
       .eq("circle_id", circleId)
+      .is("medication_schedules.retired_at", null)
       .eq("active", true),
     supabase
       .from("medication_logs")

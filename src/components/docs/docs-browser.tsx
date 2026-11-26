@@ -112,7 +112,10 @@ export function DocsBrowser({
         sizeBytes: file.size,
         sensitive
       });
-      if (res.error) throw new Error(res.error);
+      if (res.error) {
+        await supabase.storage.from("documents").remove([path]);
+        throw new Error(res.error);
+      }
       setUploadOpen(false);
       setFile(null);
       setSensitive(false);
@@ -136,7 +139,8 @@ export function DocsBrowser({
   function removeDoc(d: DocItem) {
     if (!confirm(t("confirmDelete", { name: d.name }))) return;
     start(async () => {
-      await deleteDocument(circleId, d.id);
+      const result = await deleteDocument(circleId, d.id);
+      if (result.error) setMsg(tc("errorGeneric"));
     });
   }
 

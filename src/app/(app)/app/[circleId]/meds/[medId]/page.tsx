@@ -22,10 +22,11 @@ export default async function MedDetailPage({
     supabase
       .from("medications")
       .select(
-        "id, name, dosage, instructions, active, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week)"
+        "id, name, dosage, instructions, active, archived_at, assigned:assigned_to(full_name), medication_schedules(id, time_of_day, days_of_week)"
       )
       .eq("id", medId)
       .eq("circle_id", circleId)
+      .is("medication_schedules.retired_at", null)
       .maybeSingle(),
     supabase.auth.getUser().then(({ data: { user } }) =>
       supabase
@@ -83,7 +84,7 @@ export default async function MedDetailPage({
             {med.name}
             {!med.active && (
               <span className="ml-2 rounded-full bg-line px-2 py-0.5 align-middle text-[13px] font-medium text-ink-secondary">
-                {t("inactive")}
+                {t(med.archived_at ? "archived" : "inactive")}
               </span>
             )}
           </h1>
@@ -99,7 +100,7 @@ export default async function MedDetailPage({
             </p>
           )}
         </div>
-        {canEdit && (
+        {canEdit && !med.archived_at && (
           <Link
             href={`/app/${circleId}/meds/${medId}/edit`}
             className="flex min-h-touch items-center gap-1.5 rounded-md bg-primary-soft px-3.5 text-[15px] font-semibold text-primary-dark"
@@ -162,7 +163,7 @@ export default async function MedDetailPage({
         </div>
       </Card>
 
-      {canEdit && (
+      {canEdit && !med.archived_at && (
         <MedAdminButtons
           circleId={circleId}
           medicationId={medId}

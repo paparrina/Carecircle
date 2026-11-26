@@ -125,6 +125,10 @@
     "text": "Los textos legales definitivos se añadirán antes del lanzamiento."
   },
   "meds": {
+    "archived": "Archivado",
+    "archive": "Archivar",
+    "confirmArchive": "¿Archivar este medicamento? Se conservará el historial de tomas.",
+    "archiveError": "No se pudo archivar el medicamento.",
     "title": "Medicación",
     "tabToday": "Hoy",
     "tabAll": "Todos",

@@ -1,9 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { deleteMedication, setMedicationActive } from "@/lib/meds/actions";
+import { archiveMedication, setMedicationActive } from "@/lib/meds/actions";
 
 export function MedAdminButtons({
   circleId,
@@ -15,10 +15,11 @@ export function MedAdminButtons({
   active: boolean;
 }) {
   const t = useTranslations("meds");
+  const [archiveError, setArchiveError] = useState(false);
   const [pending, start] = useTransition();
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap gap-3">
       <Button
         variant="secondary"
         className="w-auto flex-1"
@@ -34,12 +35,17 @@ export function MedAdminButtons({
         className="w-auto flex-1"
         disabled={pending}
         onClick={() => {
-          if (confirm(t("confirmDelete")))
-            start(() => deleteMedication(circleId, medicationId));
+          if (!confirm(t("confirmArchive"))) return;
+          setArchiveError(false);
+          start(async () => {
+            const result = await archiveMedication(circleId, medicationId);
+            if (result?.error) setArchiveError(true);
+          });
         }}
       >
-        {t("delete")}
+        {t("archive")}
       </Button>
+      {archiveError && <p role="alert" className="basis-full text-danger">{t("archiveError")}</p>}
     </div>
   );
 }
