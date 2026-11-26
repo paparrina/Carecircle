@@ -2,12 +2,7 @@
 
 ## 1. Supabase (backend)
 1. Crea el proyecto en https://supabase.com → **región `eu-central-1` (Frankfurt)**.
-2. SQL Editor → ejecuta en orden: `0001_init.sql`, `0002_meds_profile.sql`,
-   `0003_invitations.sql`, `0004_notifications.sql`, `0005_p0_fixes.sql`,
-   `0006_more_fixes.sql`, `0007_protect_documents_and_medication_history.sql`,
-   `0008_medication_reminders_across_midnight.sql`,
-   `0009_authenticated_table_permissions.sql`,
-   `0010_notification_email_permissions.sql`.
+2. Aplica las migraciones de `supabase/migrations/` en orden numérico.
    En una base existente, comprueba primero qué cambios están activos. Antes de
    aplicar `0007`, revisa las fichas con rutas de archivo duplicadas, fuera de su
    círculo o en carpetas de otro círculo. La migración se revierte si encuentra
@@ -26,7 +21,7 @@
 1. Crea cuenta en https://resend.com, verifica tu dominio y genera la API key.
 2. Guarda `RESEND_API_KEY` y `EMAIL_FROM` (p. ej. `CareCircle <hola@tudominio.com>`).
 
-## 3. Edge Function de emails
+## 3. Edge Function de emails y limpieza de documentos
 ```bash
 npm i -g supabase
 supabase login
@@ -37,6 +32,11 @@ supabase functions deploy notify-email
 Prográmala cada 5 min: Dashboard → Edge Functions → notify-email → Schedules
 → cron `*/5 * * * *`. El programador debe enviar el mismo secreto en
 la cabecera `x-cron-secret` y cumplir también la autenticación del proyecto.
+
+Aplica `0017_reconcile_abandoned_document_uploads.sql` antes de desplegar la
+función actualizada. El mismo trabajo programado limpia hasta 50 archivos por
+ejecución del almacén de documentos cuando llevan al menos 24 horas sin ficha.
+La limpieza se ejecuta antes del envío de correos.
 
 ## 4. Vercel (frontend)
 1. Sube el repo a GitHub e importa en https://vercel.com.

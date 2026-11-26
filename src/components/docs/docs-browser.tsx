@@ -112,10 +112,9 @@ export function DocsBrowser({
         sizeBytes: file.size,
         sensitive
       });
-      if (res.error) {
-        await supabase.storage.from("documents").remove([path]);
-        throw new Error(res.error);
-      }
+      // A failed or interrupted registration may have committed. Leave its
+      // object to the reconciler, which checks the persisted document first.
+      if (res.error) throw new Error(res.error);
       setUploadOpen(false);
       setFile(null);
       setSensitive(false);

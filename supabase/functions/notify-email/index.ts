@@ -19,13 +19,29 @@ Deno.serve(async (req) => {
     return new Response("unauthorized", { status: 401 });
   }
 
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!resendKey) return new Response("RESEND_API_KEY missing", { status: 503 });
-  const from = Deno.env.get("EMAIL_FROM") ?? "CareCircle <onboarding@resend.dev>";
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
+
+  let cleanupFailed = false;
+  const { data: abandoned, error: claimError } = await supabase.rpc(
+    "claim_abandoned_document_uploads"
+  );
+  if (claimError) {
+    cleanupFailed = true;
+    console.error("Document cleanup: unable to claim uploads", claimError.code);
+  } else if (abandoned?.length) {
+    const { error: removeError } = await supabase.storage.from("documents").remove(abandoned);
+    if (removeError) {
+      cleanupFailed = true;
+      console.error("Document cleanup: Storage removal failed", removeError.statusCode);
+    }
+  }
+
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) return new Response("RESEND_API_KEY missing", { status: 503 });
+  const from = Deno.env.get("EMAIL_FROM") ?? "CareCircle <onboarding@resend.dev>";
 
   const { data: notifs, error: queryError } = await supabase.rpc("pending_notification_emails");
 
@@ -82,7 +98,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ processed: notifs?.length ?? 0, sent, failed }),
+    JSON.stringify({ processed: notifs?.length ?? 0, sent, failed, cleanupFailed }),
     { headers: { "Content-Type": "application/json" } }
   );
 });
