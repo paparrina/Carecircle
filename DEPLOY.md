@@ -5,7 +5,8 @@
 2. SQL Editor → ejecuta en orden: `0001_init.sql`, `0002_meds_profile.sql`,
    `0003_invitations.sql`, `0004_notifications.sql`, `0005_p0_fixes.sql`,
    `0006_more_fixes.sql`, `0007_protect_documents_and_medication_history.sql`,
-   `0008_medication_reminders_across_midnight.sql`.
+   `0008_medication_reminders_across_midnight.sql`,
+   `0009_authenticated_table_permissions.sql`.
    En una base existente, comprueba primero qué cambios están activos. Antes de
    aplicar `0007`, revisa las fichas con rutas de archivo duplicadas, fuera de su
    círculo o en carpetas de otro círculo. La migración se revierte si encuentra
