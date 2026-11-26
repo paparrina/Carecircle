@@ -12,35 +12,31 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const EMAIL_TYPES = ["event_reminder", "med_missed", "mention", "important_date"];
 
-const SUBJECTS: Record<string, (p: Record<string, string>) => string> = {
-  event_reminder: (p) => `Recordatorio: ${p.title} a las ${p.time}`,
-  med_missed: (p) => `Toma sin registrar: ${p.med} (${p.time})`,
-  mention: (p) => `${p.author} te ha mencionado en el muro`,
-  important_date: (p) => `Fecha importante: ${p.title}`
-};
-
 Deno.serve(async (req) => {
   const cronSecret = Deno.env.get("CRON_SECRET");
-  if (cronSecret && req.headers.get("x-cron-secret") !== cronSecret) {
+  if (!cronSecret) return new Response("CRON_SECRET missing", { status: 503 });
+  if (req.headers.get("x-cron-secret") !== cronSecret) {
     return new Response("unauthorized", { status: 401 });
   }
 
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) return new Response("RESEND_API_KEY missing", { status: 503 });
+  const from = Deno.env.get("EMAIL_FROM") ?? "CareCircle <onboarding@resend.dev>";
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  const from = Deno.env.get("EMAIL_FROM") ?? "CareCircle <onboarding@resend.dev>";
-  if (!resendKey) return new Response("RESEND_API_KEY missing", { status: 200 });
 
   const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const { data: notifs } = await supabase
+  const { data: notifs, error: queryError } = await supabase
     .from("notifications")
-    .select("id, user_id, type, payload")
+    .select("id, user_id")
     .in("type", EMAIL_TYPES)
     .is("email_sent_at", null)
     .gte("created_at", since)
     .limit(50);
+
+  if (queryError) return new Response("Notification lookup failed", { status: 500 });
 
   let sent = 0;
   let failed = 0;
@@ -49,13 +45,13 @@ Deno.serve(async (req) => {
       const { data: u } = await supabase.auth.admin.getUserById(n.user_id);
       const email = u?.user?.email;
       if (!email) continue;
-      const p = (n.payload ?? {}) as Record<string, string>;
-      const subject = SUBJECTS[n.type]?.(p) ?? "Novedades en CareCircle";
+      const subject = "Tienes un aviso en CareCircle";
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Idempotency-Key": `carecircle-notification-${n.id}`
         },
         body: JSON.stringify({
           from,
@@ -71,10 +67,11 @@ Deno.serve(async (req) => {
       // no se reintentaba. Ahora solo se marca cuando Resend confirma éxito; si falla,
       // la siguiente ejecución (dentro de la ventana de 1h) volverá a intentarlo.
       if (res.ok) {
-        await supabase
+        const { error: markError } = await supabase
           .from("notifications")
           .update({ email_sent_at: new Date().toISOString() })
           .eq("id", n.id);
+        if (markError) throw new Error("Could not mark notification as sent");
         sent++;
       } else {
         failed++;
