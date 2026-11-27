@@ -100,6 +100,18 @@
     "doctor": "En el médico",
     "walk": "De paseo"
   },
+  "push": {
+    "title": "Avisos push",
+    "description": "Actívalos si quieres recibir avisos genéricos. Pueden retrasarse o no llegar. Para una urgencia, usa los canales de emergencia habituales.",
+    "enable": "Activar en este dispositivo",
+    "disable": "Desactivar en todos mis dispositivos",
+    "working": "Procesando…",
+    "unsupported": "Este dispositivo no admite avisos push o aún no están disponibles. En iPhone, abre la app desde la pantalla de inicio.",
+    "saved": "Avisos activados en este dispositivo.",
+    "off": "Avisos desactivados.",
+    "denied": "Permiso de avisos no concedido. Puedes revisarlo en los ajustes del dispositivo.",
+    "error": "No se pudo completar el cambio. Inténtalo de nuevo."
+  },
   "accountSettings": {
     "delete": "Eliminar mi cuenta",
     "deleteScope": "Puedes eliminar tu cuenta desde aquí si no pertenece a un círculo y no tiene datos compartidos asociados.",

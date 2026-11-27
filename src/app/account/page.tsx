@@ -1,11 +1,11 @@
+import { PushSettings } from "@/components/account/push-settings";
 import { DeleteAccount } from "@/components/account/delete-account";
 import Link from "next/link";
 import { EmailSettings } from "@/components/account/email-settings";
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { signOut } from "@/lib/auth/actions";
-import { Button } from "@/components/ui/button";
+import { SignOut } from "@/components/account/sign-out";
 import { Card } from "@/components/ui/card";
 
 export default async function AccountPage() {
@@ -22,7 +22,7 @@ export default async function AccountPage() {
     .maybeSingle();
 
   const { data: preferences, error: preferencesError } = await supabase.from("notification_preferences")
-    .select("email_enabled").eq("user_id", user.id).maybeSingle();
+    .select("email_enabled, push_enabled").eq("user_id", user.id).maybeSingle();
   const settings = await getTranslations("accountSettings");
   const tc = await getTranslations("common");
 
@@ -36,7 +36,10 @@ export default async function AccountPage() {
       <Card className="mt-4">
         <h2 className="text-lg font-bold">{settings("notifications")}</h2>
         {preferencesError ? <p role="alert">{settings("error")}</p> :
-          <EmailSettings enabled={preferences?.email_enabled ?? true} />}
+          <>
+            <EmailSettings enabled={preferences?.email_enabled ?? true} />
+            <PushSettings enabled={preferences?.push_enabled ?? false} publicKey={process.env.VAPID_PUBLIC_KEY} />
+          </>}
       </Card>
       <Card className="mt-4">
         <h2 className="text-lg font-bold">{settings("privacy")}</h2>
@@ -46,11 +49,7 @@ export default async function AccountPage() {
         <DeleteAccount />
       </Card>
       <Link href="/app" className="mt-4 inline-flex min-h-touch items-center text-primary-dark underline">{settings("back")}</Link>
-      <form action={signOut} className="mt-6">
-        <Button type="submit" variant="secondary">
-          {tc("signOut")}
-        </Button>
-      </form>
+      <SignOut />
     </main>
   );
 }

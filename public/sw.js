@@ -50,3 +50,24 @@ self.addEventListener("fetch", (e) => {
     );
   }
 });
+
+self.addEventListener("push", (event) => {
+  let payload;
+  try { payload = event.data?.json(); } catch {}
+  const match = typeof payload?.path === "string" &&
+    /^\/app\/[a-f0-9-]{36}\/notifications$/.test(payload.path);
+  event.waitUntil(self.registration.showNotification("CareCircle", {
+    body: "Tienes un aviso nuevo. Abre la aplicación para consultarlo.",
+    icon: "/icons/icon-192.png",
+    tag: typeof payload?.tag === "string" ? payload.tag : "carecircle",
+    data: { path: match ? payload.path : "/app" }
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const path = event.notification.data?.path;
+  const safe = typeof path === "string" && /^\/app\/[a-f0-9-]{36}\/notifications$/.test(path);
+  const url = new URL(safe ? path : "/app", self.location.origin);
+  event.waitUntil(self.clients.openWindow(url.href));
+});

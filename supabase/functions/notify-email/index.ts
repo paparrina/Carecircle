@@ -9,6 +9,7 @@
 // `x-cron-secret` con el mismo valor que este secreto.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { sendPushBatch } from "./push.ts";
 
 type PendingEmail = { id: string; user_id: string; email_attempts: number };
 
@@ -37,6 +38,14 @@ Deno.serve(async (req) => {
       cleanupFailed = true;
       console.error("Document cleanup: Storage removal failed", removeError.statusCode);
     }
+  }
+
+  let pushFailed = false;
+  try {
+    await sendPushBatch(supabase);
+  } catch {
+    pushFailed = true;
+    console.error("Push notifications: batch failed");
   }
 
   const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -98,7 +107,7 @@ Deno.serve(async (req) => {
   }
 
   return new Response(
-    JSON.stringify({ processed: notifs?.length ?? 0, sent, failed, cleanupFailed }),
+    JSON.stringify({ processed: notifs?.length ?? 0, sent, failed, cleanupFailed, pushFailed }),
     { headers: { "Content-Type": "application/json" } }
   );
 });

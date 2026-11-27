@@ -100,6 +100,18 @@
     "doctor": "At the doctor",
     "walk": "Out for a walk"
   },
+  "push": {
+    "title": "Push notifications",
+    "description": "Opt in to receive generic alerts. They can be delayed or fail to arrive. For an emergency, use the usual emergency channels.",
+    "enable": "Enable on this device",
+    "disable": "Disable on all my devices",
+    "working": "Working…",
+    "unsupported": "Push is unavailable or unsupported. On iPhone, open the app from the Home Screen.",
+    "saved": "Push enabled on this device.",
+    "off": "Push turned off.",
+    "denied": "Notification permission was not granted. Check your device settings.",
+    "error": "Could not complete the change. Try again."
+  },
   "accountSettings": {
     "delete": "Delete my account",
     "deleteScope": "You can delete your account here if it has no circle memberships or shared records.",
