@@ -100,6 +100,28 @@
     "doctor": "En el médico",
     "walk": "De paseo"
   },
+  "accountSettings": {
+    "delete": "Eliminar mi cuenta",
+    "deleteScope": "Puedes eliminar tu cuenta desde aquí si no pertenece a un círculo y no tiene datos compartidos asociados.",
+    "deleteConfirmation": "Confirmo que quiero eliminar mi cuenta.",
+    "deleting": "Eliminando…",
+    "deleteBlocked": "No se pudo eliminar la cuenta. Si perteneces a un círculo o tienes datos compartidos, esos datos deben gestionarse primero.",
+    "deleted": "Tu cuenta se ha eliminado.",
+    "title": "Ajustes",
+    "scope": "Las preferencias de aviso son personales y se aplican a todos tus círculos.",
+    "openAccount": "Abrir Mi cuenta",
+    "notifications": "Notificaciones",
+    "email": "Avisos por correo electrónico",
+    "save": "Guardar preferencias",
+    "saving": "Guardando…",
+    "saved": "Preferencias guardadas.",
+    "error": "No se pudo cargar o guardar. Inténtalo de nuevo.",
+    "privacy": "Privacidad",
+    "export": "Descargar datos de mi cuenta",
+    "exportScope": "El archivo contiene tu perfil, tus pertenencias a círculos y tus preferencias.",
+    "legal": "Privacidad y términos",
+    "back": "Volver a mis círculos"
+  },
   "home": {
     "title": "Hoy",
     "overdueTitle": "Tomas atrasadas",

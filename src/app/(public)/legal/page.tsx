@@ -23,6 +23,7 @@ function P({ children }: { children: React.ReactNode }) {
 export default function LegalPage() {
   return (
     <main className="mx-auto max-w-2xl px-5 py-12">
+      <p className="mb-3 rounded-md bg-warning-soft p-3 text-warning">Borrador para el entorno de pruebas. Pendiente de revisión antes de aceptar datos reales.</p>
       <h1 className="text-3xl font-semibold text-ink">
         Privacidad, cookies y condiciones de uso
       </h1>
@@ -42,8 +43,7 @@ export default function LegalPage() {
           tus datos. Los datos de la persona que cuidáis solo los ve su
           círculo. Todo se guarda cifrado en servidores de la Unión Europea.
           No vendemos datos, no hay publicidad y no usamos cookies de rastreo
-          — por eso no verás banner de cookies. Puedes exportar o borrar todo
-          cuando quieras.
+          — por eso no verás banner de cookies. En Mi cuenta puedes descargar los datos de tu cuenta.
         </P>
       </section>
 
@@ -51,15 +51,7 @@ export default function LegalPage() {
 
       <H3>1.1 Responsable del tratamiento</H3>
       <P>
-        [NOMBRE Y APELLIDOS / RAZÓN SOCIAL], con domicilio en [DIRECCIÓN] y
-        correo de contacto para privacidad:{" "}
-        <a
-          className="text-primary underline"
-          href="mailto:privacidad@ejemplo.com"
-        >
-          privacidad@ejemplo.com
-        </a>
-        .
+        Borrador pendiente de confirmar. El responsable del tratamiento y su canal de privacidad se publicarán antes de la beta con datos reales.
       </P>
 
       <H3>1.2 Qué datos tratamos</H3>
@@ -111,21 +103,12 @@ export default function LegalPage() {
 
       <H3>1.6 Cuánto tiempo conservamos los datos</H3>
       <P>
-        Mientras el círculo exista. Si eliminas un documento, una publicación
-        o un círculo completo, se borra de forma efectiva de nuestros
-        sistemas en un plazo máximo de 30 días (incluidas copias de
-        seguridad). Si eliminas tu cuenta, desaparecen tus datos personales;
-        el contenido esencial del círculo puede conservarse para el resto de
-        la familia si así lo decide la persona coordinadora.
+        El plazo de conservación de los datos compartidos y de las copias de seguridad está pendiente de confirmación. Desde Mi cuenta puedes eliminar una cuenta sin pertenencias a círculos ni datos compartidos asociados.
       </P>
 
       <H3>1.7 Tus derechos</H3>
       <P>
-        Acceso, rectificación, supresión, oposición, limitación y
-        portabilidad: escríbenos al correo de privacidad y responderemos en
-        un máximo de 30 días. Puedes pedir una copia exportada de los datos
-        del círculo. Si crees que no lo hacemos bien, puedes reclamar ante la
-        Agencia Española de Protección de Datos (aepd.es).
+        El procedimiento para solicitar el acceso, la rectificación, la supresión, la oposición, la limitación o la portabilidad está pendiente de confirmación. La descarga de Mi cuenta contiene el perfil y las preferencias personales.
       </P>
 
       <H3>1.8 Seguridad</H3>

@@ -22,7 +22,9 @@ import { GoogleIcon } from "@/components/shared/google-icon";
 function LoginForm() {
   const t = useTranslations("auth");
   const [email, setEmail] = useState("");
-  const next = useSearchParams().get("next") ?? "/app";
+  const params = useSearchParams();
+  const next = params.get("next") ?? "/app";
+  const account = useTranslations("accountSettings");
   const [pwState, pwAction, pwPending] = useActionState<AuthState, FormData>(
     loginWithPassword,
     null
@@ -39,6 +41,7 @@ function LoginForm() {
         {t("loginTitle")}
       </h1>
 
+      {params.get("accountDeleted") === "1" && <p role="status" className="mb-4 text-success">{account("deleted")}</p>}
       <form action={loginWithGoogle}>
         <input type="hidden" name="next" value={next} />
         <Button type="submit" variant="secondary" size="lg">

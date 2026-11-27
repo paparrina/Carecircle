@@ -100,6 +100,28 @@
     "doctor": "At the doctor",
     "walk": "Out for a walk"
   },
+  "accountSettings": {
+    "delete": "Delete my account",
+    "deleteScope": "You can delete your account here if it has no circle memberships or shared records.",
+    "deleteConfirmation": "I confirm that I want to delete my account.",
+    "deleting": "Deleting…",
+    "deleteBlocked": "The account could not be deleted. If you belong to a circle or have shared records, these must be handled first.",
+    "deleted": "Your account has been deleted.",
+    "title": "Settings",
+    "scope": "Notification preferences are personal and apply to all your circles.",
+    "openAccount": "Open my account",
+    "notifications": "Notifications",
+    "email": "Email notifications",
+    "save": "Save preferences",
+    "saving": "Saving…",
+    "saved": "Preferences saved.",
+    "error": "Could not load or save. Try again.",
+    "privacy": "Privacy",
+    "export": "Download my account data",
+    "exportScope": "The file contains your profile, circle memberships and preferences.",
+    "legal": "Privacy and terms",
+    "back": "Return to my circles"
+  },
   "home": {
     "title": "Today",
     "overdueTitle": "Overdue doses",

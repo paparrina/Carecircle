@@ -39,6 +39,7 @@ export default async function HomePage({
       .select("id, title, date, type, recurring")
       .eq("circle_id", circleId)
   ]);
+  const settings = await getTranslations("accountSettings");
   const onboarding = await getTranslations("onboarding");
   const tDates = await getTranslations("importantDates");
   const upcomingDates = (impDates ?? [])
@@ -129,6 +130,10 @@ export default async function HomePage({
 
       <Link href={`/app/${circleId}/welcome`} className="inline-flex min-h-touch items-center font-semibold text-primary-dark underline">
         {onboarding("resumeTutorial")}
+      </Link>
+
+      <Link href={`/app/${circleId}/settings`} className="inline-flex min-h-touch items-center font-semibold text-primary-dark underline">
+        {settings("title")}
       </Link>
 
       {upcomingDates.length > 0 && (
