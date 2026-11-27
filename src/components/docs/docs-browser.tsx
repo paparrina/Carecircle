@@ -161,10 +161,9 @@ export function DocsBrowser({
         />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1" role="tablist">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         <button
-          role="tab"
-          aria-selected={folderId === "all"}
+          aria-pressed={folderId === "all"}
           onClick={() => setFolderId("all")}
           className={cn(
             "min-h-touch shrink-0 rounded-full border px-4 text-[15px] font-semibold",
@@ -178,8 +177,7 @@ export function DocsBrowser({
         {folders.map((f) => (
           <button
             key={f.id}
-            role="tab"
-            aria-selected={folderId === f.id}
+            aria-pressed={folderId === f.id}
             onClick={() => setFolderId(f.id)}
             className={cn(
               "min-h-touch shrink-0 rounded-full border px-4 text-[15px] font-semibold",
