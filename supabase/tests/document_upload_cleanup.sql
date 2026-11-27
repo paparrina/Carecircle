@@ -1,4 +1,4 @@
--- Run in the test project or disposable PostgreSQL with migrations through 0018.
+-- Run in the test project or disposable PostgreSQL with migrations through 0020.
 begin;
 
 insert into auth.users (id, email) values
@@ -11,7 +11,8 @@ insert into storage.objects (bucket_id, name, metadata, created_at)
 select 'documents', 'circles/00000000-0000-0000-0000-000000000042/' || path,
   '{"size":42,"mimetype":"application/pdf"}', now() - age
 from (values ('old.pdf', interval '25 hours'), ('fresh.pdf', interval '1 hour'),
-  ('registered.pdf', interval '25 hours')) examples(path, age);
+  ('registered.pdf', interval '25 hours'), ('wall/published.jpg', interval '25 hours'),
+  ('wall/abandoned.jpg', interval '25 hours')) examples(path, age);
 
 update storage.objects set version='fixture-version'
 where name='circles/00000000-0000-0000-0000-000000000042/registered.pdf';
@@ -33,6 +34,10 @@ begin
   end if;
 end $$;
 
+insert into public.posts (circle_id, author_id, body, attachments)
+values ('00000000-0000-0000-0000-000000000042', auth.uid(), 'Wall fixture',
+  '[{"storage_path":"circles/00000000-0000-0000-0000-000000000042/wall/published.jpg"}]');
+
 set local role service_role;
 do $$
 declare
@@ -41,7 +46,7 @@ declare
 begin
   select array_agg(path order by path) into v_claimed
   from public.claim_abandoned_document_uploads() path where path like v_prefix || '%';
-  if v_claimed is distinct from array[v_prefix || 'old.pdf'] then
+  if v_claimed is distinct from array[v_prefix || 'old.pdf', v_prefix || 'wall/abandoned.jpg'] then
     raise exception 'Cleanup claimed unexpected paths';
   end if;
   if exists (select 1 from public.claim_abandoned_document_uploads() path where path like v_prefix || '%') then
@@ -59,6 +64,14 @@ begin
     raise exception 'An upload claimed for cleanup was attached';
   exception when raise_exception then
     if sqlerrm <> 'document_upload_expired' then raise; end if;
+  end;
+  begin
+    insert into public.posts (circle_id, author_id, body, attachments)
+    values ('00000000-0000-0000-0000-000000000042', auth.uid(), 'Late wall fixture',
+      '[{"storage_path":"circles/00000000-0000-0000-0000-000000000042/wall/abandoned.jpg"}]');
+    raise exception 'A wall upload claimed for cleanup was attached';
+  exception when raise_exception then
+    if sqlerrm <> 'wall_attachment_upload_expired' then raise; end if;
   end;
 end $$;
 
