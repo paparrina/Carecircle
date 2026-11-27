@@ -99,7 +99,7 @@ export default async function HomePage({
           <CardTitle className="text-[#805510]">{t("overdueTitle")}</CardTitle>
           {[
             { date: yesterday, label: t("yesterday"), items: previousPending },
-            { date: today, label: tDates("today"), items: overdue }
+            { date: today, label: t("title"), items: overdue }
           ].filter(({ items }) => items.length > 0).map(({ date, label, items }) => (
             <div key={date} className="mt-3">
               <h3 className="text-sm font-semibold text-[#805510]">{label}</h3>
