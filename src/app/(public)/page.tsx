@@ -34,10 +34,10 @@ export default async function LandingPage() {
           <form action={setLandingLanguage} aria-label={t("language")} className="flex items-center gap-1">
             {(["es", "en"] as const).map((language) => (
               <button key={language} type="submit" name="locale" value={language}
-                lang={language} aria-label={language === "es" ? "Español" : "English"}
+                lang={language}
                 aria-pressed={locale === language}
                 className={`min-h-touch min-w-[48px] rounded-lg px-2 text-sm font-semibold ${locale === language ? "bg-[#e6ebe2]" : "hover:bg-[#efeee7]"}`}>
-                {language.toUpperCase()}
+                {language === "es" ? "Español" : "English"}
               </button>
             ))}
           </form>
