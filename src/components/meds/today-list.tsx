@@ -101,7 +101,7 @@ export function TodayDoseList({
           return (
             <li
               key={d.scheduleId}
-              className="flex items-center gap-3 border-b border-line py-3 last:border-0"
+              className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-2 border-b border-line py-3 last:border-0 sm:flex sm:items-start"
             >
               <span
                 aria-hidden
@@ -125,28 +125,27 @@ export function TodayDoseList({
                 )}
               </span>
 
-              <span className="w-14 shrink-0 text-lg font-bold text-ink">
-                {d.time}
-              </span>
-
-              <span className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1">
+                <span className="block text-lg font-bold tabular-nums text-ink">
+                  {d.time}
+                </span>
                 <span
                   className={cn(
-                    "block truncate text-[16px]",
+                    "block break-words text-base",
                     d.log?.status === "taken"
                       ? "text-ink-secondary"
                       : "font-medium text-ink"
                   )}
                 >
-                  {d.name}{" "}
-                  <span className="font-normal text-ink-secondary">
-                    · {d.dosage}
-                  </span>
+                  {d.name}
+                </span>
+                <span className="block break-words text-sm text-ink-secondary">
+                  {d.dosage}
                 </span>
                 <span
                   className={cn(
-                    "block truncate text-[13.5px]",
-                    late ? "font-medium text-warning" : "text-ink-secondary"
+                    "block break-words text-sm",
+                    late ? "font-medium text-[#805510]" : "text-ink-secondary"
                   )}
                 >
                   {d.log
@@ -157,14 +156,14 @@ export function TodayDoseList({
                       ? t("responsible", { name: d.assignedName })
                       : t("pendingAt")}
                 </span>
-              </span>
+              </div>
 
               {!d.log && (
-                <span className="flex shrink-0 flex-col items-end gap-1">
+                <div className="col-start-2 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:shrink-0 sm:flex-col sm:items-end">
                   <button
                     onClick={() => register(d, "taken")}
                     disabled={pendingId === d.scheduleId}
-                    className="min-h-[44px] rounded-md bg-primary px-3.5 text-[15px] font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+                    className="min-h-touch max-w-full break-words rounded-md bg-primary-dark px-3.5 py-1 text-[15px] font-semibold text-white hover:bg-ink disabled:opacity-50"
                   >
                     {t("markTaken")}
                   </button>
@@ -172,12 +171,12 @@ export function TodayDoseList({
                     <button
                       onClick={() => register(d, "skipped")}
                       disabled={pendingId === d.scheduleId}
-                      className="text-[13.5px] font-medium text-ink-secondary underline underline-offset-2"
+                      className="min-h-touch min-w-[48px] px-2 text-sm font-medium text-ink-secondary underline underline-offset-2"
                     >
                       {t("skip")}
                     </button>
                   )}
-                </span>
+                </div>
               )}
             </li>
           );
