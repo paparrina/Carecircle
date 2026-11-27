@@ -422,6 +422,13 @@
     "today": "hoy"
   },
   "onboarding": {
+    "circleCreated": "Círculo familiar creado",
+    "recipientAdded": "Persona cuidada añadida",
+    "tutorialIntro": "Puedes hacer los pasos en cualquier orden y volver desde Hoy.",
+    "stepDone": "Completado",
+    "askCoordinator": "Pídeselo a quien coordina",
+    "goToToday": "Ir a Hoy y continuar más tarde",
+    "resumeTutorial": "Abrir tutorial de bienvenida",
     "welcomeTitle": "El círculo de {name} ya existe 🎉",
     "welcomeQuestion": "¿Qué es lo que más te cuesta coordinar ahora?",
     "welcomeHint": "Empieza por ahí: en 2 minutos tendrás el primer valor real.",

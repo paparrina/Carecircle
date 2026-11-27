@@ -422,6 +422,13 @@
     "today": "today"
   },
   "onboarding": {
+    "circleCreated": "Family circle created",
+    "recipientAdded": "Care recipient added",
+    "tutorialIntro": "Complete the steps in any order and return from Today.",
+    "stepDone": "Completed",
+    "askCoordinator": "Ask your circle coordinator",
+    "goToToday": "Go to Today and continue later",
+    "resumeTutorial": "Open the welcome tutorial",
     "welcomeTitle": "{name}'s circle is ready 🎉",
     "welcomeQuestion": "What's hardest to coordinate right now?",
     "welcomeHint": "Start there: you'll get real value in 2 minutes.",

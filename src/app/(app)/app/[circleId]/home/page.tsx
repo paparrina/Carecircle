@@ -6,7 +6,6 @@ import { getTodayDoses, type TodayDose } from "@/lib/meds/queries";
 import { getNextAppointment } from "@/lib/events/queries";
 import { lastNDates, nextOccurrence, timeInCircleTZ } from "@/lib/dates";
 import { DATE_ICON } from "@/components/circle/important-dates";
-import { OnboardingChecklist } from "@/components/circle/onboarding-checklist";
 import { Card, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 
@@ -40,29 +39,7 @@ export default async function HomePage({
       .select("id, title, date, type, recurring")
       .eq("circle_id", circleId)
   ]);
-  const [
-    { count: memberCount },
-    { count: docCount },
-    { count: medCount },
-    { count: eventCount }
-  ] = await Promise.all([
-    supabase
-      .from("circle_members")
-      .select("id", { count: "exact", head: true })
-      .eq("circle_id", circleId),
-    supabase
-      .from("documents")
-      .select("id", { count: "exact", head: true })
-      .eq("circle_id", circleId),
-    supabase
-      .from("medications")
-      .select("id", { count: "exact", head: true })
-      .eq("circle_id", circleId),
-    supabase
-      .from("events")
-      .select("id", { count: "exact", head: true })
-      .eq("circle_id", circleId)
-  ]);
+  const onboarding = await getTranslations("onboarding");
   const tDates = await getTranslations("importantDates");
   const upcomingDates = (impDates ?? [])
     .map((d) => ({ ...d, next: nextOccurrence(d.date, d.recurring, today) }))
@@ -150,13 +127,9 @@ export default async function HomePage({
         </Link>
       </Card>
 
-      <OnboardingChecklist
-        circleId={circleId}
-        hasMed={(medCount ?? 0) > 0}
-        hasEvent={(eventCount ?? 0) > 0}
-        hasSecondMember={(memberCount ?? 0) > 1}
-        hasDoc={(docCount ?? 0) > 0}
-      />
+      <Link href={`/app/${circleId}/welcome`} className="inline-flex min-h-touch items-center font-semibold text-primary-dark underline">
+        {onboarding("resumeTutorial")}
+      </Link>
 
       {upcomingDates.length > 0 && (
         <Card>
