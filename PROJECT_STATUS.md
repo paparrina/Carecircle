@@ -15,6 +15,6 @@ Actualizado el 27 de noviembre de 2026. Rama de trabajo `carecircle-v2`. [Previe
 
 - Las cinco suites SQL pasan localmente y en CareCircle-pruebas. `private_beta_preferences.sql` comprueba preferencias aisladas, exclusión de correo, borrado limitado y reclamación/reintento sin duplicados.
 - Las cinco pruebas Deno cubren el validador de archivos y el emisor push con respuestas de proveedor simuladas. TypeScript, ESLint, compilación y npm audit se verificaron con el código de beta.
-- El recorrido con datos ficticios debe contrastarse con la entrega real en dispositivos. La confirmación anterior de correo a Gmail sigue siendo evidencia de la ruta de correo existente. Push carece todavía de esa evidencia.
+- En un móvil emulado con datos ficticios se verificaron la conservación de campos tras un error, el tutorial recuperable, el estado de invitaciones, la descarga de cuenta, la exclusión de correo y la denegación del permiso push. La entrega real debe contrastarse en dispositivos físicos. La confirmación anterior de correo a Gmail sigue siendo evidencia de la ruta de correo existente. Push carece todavía de esa evidencia.
 - La descarga autoservicio cubre la cuenta. La exportación más amplia y la gestión del borrado con contenido familiar compartido siguen sujetas a decisiones de privacidad.
 - Google OAuth en pruebas y VoiceOver/TalkBack en móviles físicos permanecen pendientes.

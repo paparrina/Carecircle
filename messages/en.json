@@ -320,8 +320,8 @@
     },
     "roleHints": {
       "coordinator": "Manages the circle, member permissions and invitations.",
-      "member": "Sees and edits everything except members and settings.",
-      "viewer": "Sees everything, logs doses and location, but doesn't edit."
+      "member": "Can edit appointments, medication and documents. The coordinator manages members and invitations.",
+      "viewer": "Can view the circle and record doses and locations. Cannot edit schedules or open sensitive documents."
     },
     "remove": "Remove from circle",
     "confirmRemove": "Remove {name} from the circle? They will lose access to all information.",
