@@ -35,7 +35,7 @@ export function TodayDoseList({
   const [, startTransition] = useTransition();
   const [toast, setToast] = useState<{
     text: string;
-    undo?: () => void;
+    undo?: { logId: string; run: () => void };
   } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -46,7 +46,7 @@ export function TodayDoseList({
     []
   );
 
-  function showToast(text: string, undo?: () => void) {
+  function showToast(text: string, undo?: { logId: string; run: () => void }) {
     setToast({ text, undo });
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToast(null), 10000);
@@ -67,20 +67,23 @@ export function TodayDoseList({
         const logId = res.logId;
         showToast(
           status === "taken" ? t("doseSaved") : t("doseSkipped"),
-          () => {
-            setToast(null);
-            startTransition(async () => {
-              await undoDose(circleId, logId);
-              router.refresh();
-            });
+          {
+            logId,
+            run: () => {
+              setToast(null);
+              startTransition(async () => {
+                const result = await undoDose(circleId, logId);
+                if (result.error) showToast(t("genericError"));
+              });
+            }
           }
         );
       } else if (res.error === "conflict") {
         showToast(t("alreadyLogged"));
+        router.refresh();
       } else if (res.error) {
         showToast(t("genericError"));
       }
-      router.refresh();
     });
   }
 
@@ -191,8 +194,9 @@ export function TodayDoseList({
           {toast.text}
           {toast.undo && (
             <button
-              onClick={toast.undo}
-              className="ml-4 min-h-touch font-semibold text-[#9FD3C2] underline underline-offset-2"
+              onClick={toast.undo.run}
+              disabled={!doses.some((dose) => dose.log?.id === toast.undo?.logId)}
+              className="ml-4 min-h-touch font-semibold text-[#9FD3C2] underline underline-offset-2 disabled:opacity-50"
             >
               {t("undo")}
             </button>

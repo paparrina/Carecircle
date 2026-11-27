@@ -142,6 +142,8 @@ export async function logDose(input: {
 
 export async function undoDose(circleId: string, logId: string) {
   const supabase = await createClient();
-  await supabase.from("medication_logs").delete().eq("id", logId).eq("circle_id", circleId);
+  const { error } = await supabase.from("medication_logs").delete().eq("id", logId).eq("circle_id", circleId);
+  if (error) return { error: true };
   revalidatePath(`/app/${circleId}`, "layout");
+  return { error: false };
 }
