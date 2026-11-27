@@ -71,3 +71,20 @@ export async function getUpcomingEvents(
     .limit(limit);
   return (data ?? []).map(mapEvent);
 }
+
+export async function getNextAppointment(circleId: string, fromISO: string): Promise<EventItem | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select(SELECT)
+    .eq("circle_id", circleId)
+    .in("type", ["medical", "visit"])
+    .is("completed_at", null)
+    .gte("starts_at", fromISO)
+    .order("starts_at")
+    .order("id")
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapEvent(data) : null;
+}

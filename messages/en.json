@@ -97,12 +97,16 @@
     "walk": "Out for a walk"
   },
   "home": {
-    "medsTitle": "Today's medication",
-    "medsEmpty": "No medications yet.",
-    "medsEmptyCta": "Add {name}'s first medication",
-    "agendaTitle": "Today's agenda",
-    "agendaEmpty": "Nothing planned for today.",
-    "agendaEmptyCta": "Add an appointment or visit",
+    "title": "Today",
+    "overdueTitle": "Overdue doses",
+    "yesterday": "Yesterday",
+    "nextDoseTitle": "Next dose today",
+    "nextDoseEmpty": "No upcoming doses today.",
+    "unassigned": "No one assigned",
+    "nextAppointmentTitle": "Next appointment",
+    "nextAppointmentEmpty": "No upcoming appointments or visits.",
+    "openCalendar": "View calendar",
+    "importantDatesTitle": "Important dates",
     "wallTitle": "Latest on the wall",
     "wallEmpty": "No family updates yet.",
     "wallEmptyCta": "Write the first update"

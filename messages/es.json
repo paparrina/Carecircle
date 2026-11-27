@@ -97,12 +97,16 @@
     "walk": "De paseo"
   },
   "home": {
-    "medsTitle": "Medicación de hoy",
-    "medsEmpty": "Todavía no hay medicamentos.",
-    "medsEmptyCta": "Añade la primera medicación de {name}",
-    "agendaTitle": "Hoy en la agenda",
-    "agendaEmpty": "Nada previsto para hoy.",
-    "agendaEmptyCta": "Añade una cita o visita",
+    "title": "Hoy",
+    "overdueTitle": "Tomas atrasadas",
+    "yesterday": "Ayer",
+    "nextDoseTitle": "Próxima toma de hoy",
+    "nextDoseEmpty": "No quedan tomas próximas para hoy.",
+    "unassigned": "Sin responsable asignado",
+    "nextAppointmentTitle": "Próxima cita",
+    "nextAppointmentEmpty": "No hay citas ni visitas próximas.",
+    "openCalendar": "Ver agenda",
+    "importantDatesTitle": "Fechas importantes",
     "wallTitle": "Último en el muro",
     "wallEmpty": "Aún no hay mensajes de la familia.",
     "wallEmptyCta": "Escribe la primera actualización"
