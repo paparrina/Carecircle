@@ -1,5 +1,7 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2 } from "lucide-react";
@@ -55,7 +57,7 @@ export function ProfileForm({
   const inputCls = "text-[16px]";
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form onSubmit={preserveForm(action)} className="flex flex-col gap-4">
       <input type="hidden" name="circleId" value={circleId} />
       <input type="hidden" name="contacts" value={JSON.stringify(contacts)} />
       <input type="hidden" name="doctors" value={JSON.stringify(doctors)} />

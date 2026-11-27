@@ -273,6 +273,10 @@
     }
   },
   "members": {
+    "rolesTitle": "Permisos de cada rol",
+    "invitationHistory": "Invitaciones recientes",
+    "invitationStatus": {"pending":"Pendiente","accepted":"Aceptada","expired":"Caducada"},
+    "invitationActionError": "No se pudo realizar la acción. Actualiza la página e inténtalo de nuevo.",
     "title": "Miembros del círculo",
     "you": "tú",
     "roleNames": {
@@ -281,9 +285,9 @@
       "viewer": "Cuidador/a (acceso limitado)"
     },
     "roleHints": {
-      "coordinator": "Gestiona todo, incluidos miembros y ajustes.",
-      "member": "Ve y edita todo, menos miembros y ajustes.",
-      "viewer": "Lo ve todo, registra tomas y ubicación, pero no edita."
+      "coordinator": "Coordina el círculo, gestiona los permisos y envía invitaciones.",
+      "member": "Edita la agenda, la medicación y los documentos. El coordinador gestiona miembros e invitaciones.",
+      "viewer": "Consulta el círculo y registra tomas y ubicación. No puede editar pautas ni abrir documentos sensibles."
     },
     "remove": "Quitar del círculo",
     "confirmRemove": "¿Quitar a {name} del círculo? Dejará de ver toda la información.",

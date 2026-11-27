@@ -1,5 +1,7 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -52,7 +54,7 @@ export function EventForm({
   );
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={preserveForm(formAction)} className="flex flex-col gap-5">
       <input type="hidden" name="circleId" value={circleId} />
       <input type="hidden" name="type" value={type} />
       <input type="hidden" name="assignedTo" value={assignedTo} />

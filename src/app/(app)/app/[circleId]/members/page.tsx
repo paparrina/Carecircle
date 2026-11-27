@@ -45,15 +45,15 @@ export default async function MembersPage({
   const canManage = myRole === "coordinator";
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const now = new Date().toISOString();
   const invitations = canManage
     ? (
         await supabase
           .from("invitations")
-          .select("id, email, role, token, expires_at")
+          .select("id, email, role, token, expires_at, accepted_at")
           .eq("circle_id", circleId)
-          .is("accepted_at", null)
-          .gt("expires_at", new Date().toISOString())
           .order("created_at", { ascending: false })
+          .limit(50)
       ).data ?? []
     : [];
 
@@ -68,6 +68,17 @@ export default async function MembersPage({
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold text-ink">{t("title")}</h1>
 
+      <Card>
+        <CardTitle>{t("rolesTitle")}</CardTitle>
+        <dl className="mt-2 grid gap-2 text-sm">
+          {(["coordinator", "member", "viewer"] as const).map((role) => (
+            <div key={role}>
+              <dt className="font-semibold">{t(`roleNames.${role}`)}</dt>
+              <dd className="text-ink-secondary">{t(`roleHints.${role}`)}</dd>
+            </div>
+          ))}
+        </dl>
+      </Card>
       <Card>
         <ul>
           {members.map((m) => (
@@ -93,7 +104,7 @@ export default async function MembersPage({
 
           {invitations.length > 0 && (
             <Card>
-              <CardTitle>{t("pendingTitle")}</CardTitle>
+              <CardTitle>{t("invitationHistory")}</CardTitle>
               <ul className="mt-1">
                 {invitations.map((inv) => (
                   <InvitationRow
@@ -102,7 +113,8 @@ export default async function MembersPage({
                     id={inv.id}
                     email={inv.email}
                     role={inv.role}
-                    url={`${siteUrl}/invite/${inv.token}`}
+                    status={inv.accepted_at ? "accepted" : inv.expires_at <= now ? "expired" : "pending"}
+                    url={!inv.accepted_at && inv.expires_at > now ? `${siteUrl}/invite/${inv.token}` : null}
                     expiresLabel={t("expires", {
                       date: fmtDate(inv.expires_at)
                     })}

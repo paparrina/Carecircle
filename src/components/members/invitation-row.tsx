@@ -11,36 +11,42 @@ export function InvitationRow({
   email,
   role,
   url,
-  expiresLabel
+  expiresLabel,
+  status
 }: {
   circleId: string;
   id: string;
   email: string | null;
   role: string;
-  url: string;
+  url: string | null;
+  status: "pending" | "accepted" | "expired";
   expiresLabel: string;
 }) {
   const t = useTranslations("members");
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(false);
   const [pending, start] = useTransition();
 
   return (
     <li className="flex items-center gap-3 border-b border-line py-3 last:border-0">
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[16px] font-medium text-ink">
+        <span className="block break-words text-[16px] font-medium text-ink">
           {email ?? t("pendingLink")}
         </span>
         <span className="block text-[13.5px] text-ink-secondary">
-          {t(`roleNames.${role}` as "roleNames.member")} · {expiresLabel}
+          {t(`roleNames.${role}` as "roleNames.member")} · {t(`invitationStatus.${status}`)}
+          {status === "pending" && ` · ${expiresLabel}`}
         </span>
       </span>
+      {url && <>
       <button
         onClick={async () => {
+          setError(false);
           try {
             await navigator.clipboard.writeText(url);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-          } catch {}
+          } catch { setError(true); }
         }}
         aria-label={t("copyLink")}
         className="flex h-11 min-w-[44px] items-center justify-center gap-1 rounded-md bg-primary-soft px-2.5 text-[14px] font-semibold text-primary-dark"
@@ -48,13 +54,15 @@ export function InvitationRow({
         <Copy size={17} /> {copied ? "✓" : ""}
       </button>
       <button
-        onClick={() => start(() => revokeInvitation(circleId, id))}
+        onClick={() => start(async () => setError(!(await revokeInvitation(circleId, id))))}
         disabled={pending}
         aria-label={t("revoke")}
         className="flex h-11 w-11 items-center justify-center rounded-md text-danger hover:bg-danger/10"
       >
         <X size={20} />
       </button>
+      </>}
+      {error && <p role="alert" className="text-sm text-danger">{t("invitationActionError")}</p>}
     </li>
   );
 }

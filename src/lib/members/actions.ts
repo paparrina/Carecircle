@@ -72,8 +72,11 @@ export async function createInvitation(input: {
 
 export async function revokeInvitation(circleId: string, invitationId: string) {
   const supabase = await createClient();
-  await supabase.from("invitations").delete().eq("id", invitationId);
+  const { data, error } = await supabase.from("invitations").delete()
+    .eq("id", invitationId).eq("circle_id", circleId).is("accepted_at", null).select("id");
+  if (error || !data?.length) return false;
   revalidatePath(`/app/${circleId}/members`);
+  return true;
 }
 
 async function coordinatorCount(circleId: string): Promise<number> {

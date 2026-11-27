@@ -1,5 +1,7 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import {
   Home,
   Building2,
@@ -56,7 +58,7 @@ export function LocationCheckinSheet({
       onClose={onClose}
       title={t("title", { name: recipientName })}
     >
-      <form action={formAction} className="flex flex-col gap-3">
+      <form onSubmit={preserveForm(formAction)} className="flex flex-col gap-3">
         <input type="hidden" name="circleId" value={circleId} />
         <div className="grid grid-cols-2 gap-2">
           {places.map(({ value, icon: Icon }) => (

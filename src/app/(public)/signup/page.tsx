@@ -1,5 +1,7 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useActionState } from "react";
@@ -38,7 +40,7 @@ function SignupForm() {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <form action={action} className="flex flex-col gap-4">
+      <form onSubmit={preserveForm(action)} className="flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
         <div>
           <Label htmlFor="fullName">{t("fullName")}</Label>

@@ -70,6 +70,8 @@ export function InviteComposer({
             <button
               key={r}
               type="button"
+              aria-pressed={role === r}
+              disabled={pending}
               onClick={() => setRole(r)}
               className={cn(
                 "rounded-md border px-4 py-3 text-left",
@@ -121,7 +123,7 @@ export function InviteComposer({
 
       {msg && (
         <p
-          role="status"
+          role={msg.kind === "err" ? "alert" : "status"}
           className={cn(
             "mt-4 break-all rounded-md p-3 text-[15px] font-medium",
             msg.kind === "ok" && "bg-success-soft text-success",

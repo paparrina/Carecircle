@@ -1,5 +1,7 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import Link from "next/link";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
@@ -24,7 +26,7 @@ export default function NewCirclePage() {
       </h1>
       <p className="mt-2 text-lg text-ink-secondary">{t("subtitle")}</p>
 
-      <form action={action} className="mt-8 flex flex-col gap-5">
+      <form onSubmit={preserveForm(action)} className="mt-8 flex flex-col gap-5">
         <div>
           <Label htmlFor="recipientName">{t("nameLabel")}</Label>
           <Input

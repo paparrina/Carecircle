@@ -273,6 +273,10 @@
     }
   },
   "members": {
+    "rolesTitle": "Permissions by role",
+    "invitationHistory": "Recent invitations",
+    "invitationStatus": {"pending":"Pending","accepted":"Accepted","expired":"Expired"},
+    "invitationActionError": "The action failed. Refresh and try again.",
     "title": "Circle members",
     "you": "you",
     "roleNames": {
@@ -281,7 +285,7 @@
       "viewer": "Caregiver (limited access)"
     },
     "roleHints": {
-      "coordinator": "Manages everything, including members and settings.",
+      "coordinator": "Manages the circle, member permissions and invitations.",
       "member": "Sees and edits everything except members and settings.",
       "viewer": "Sees everything, logs doses and location, but doesn't edit."
     },

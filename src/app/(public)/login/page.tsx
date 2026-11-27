@@ -1,9 +1,11 @@
 "use client";
 
+import { preserveForm } from "@/lib/preserve-form";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useActionState } from "react";
+import { Suspense, useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ import { GoogleIcon } from "@/components/shared/google-icon";
 
 function LoginForm() {
   const t = useTranslations("auth");
+  const [email, setEmail] = useState("");
   const next = useSearchParams().get("next") ?? "/app";
   const [pwState, pwAction, pwPending] = useActionState<AuthState, FormData>(
     loginWithPassword,
@@ -48,7 +51,7 @@ function LoginForm() {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      <form action={pwAction} className="flex flex-col gap-4">
+      <form onSubmit={preserveForm(pwAction)} className="flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
         <div>
           <Label htmlFor="email">{t("email")}</Label>
@@ -56,6 +59,8 @@ function LoginForm() {
             id="email"
             name="email"
             type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
             required
           />
@@ -81,21 +86,9 @@ function LoginForm() {
       </form>
 
       <form action={mlAction} className="mt-4">
-        {/* Reutiliza el email escrito arriba mediante FormData del propio form */}
-        <input type="hidden" name="email" id="ml-email" />
+        <input type="hidden" name="email" value={email} />
         <input type="hidden" name="next" value={next} />
-        <Button
-          type="submit"
-          variant="ghost"
-          disabled={mlPending}
-          onClick={() => {
-            const email = (
-              document.getElementById("email") as HTMLInputElement | null
-            )?.value;
-            (document.getElementById("ml-email") as HTMLInputElement).value =
-              email ?? "";
-          }}
-        >
+        <Button type="submit" variant="ghost" disabled={mlPending || !email}>
           <Mail size={20} /> {t("magicLink")}
         </Button>
         <p className="mt-1 text-center text-[15px] text-ink-secondary">
