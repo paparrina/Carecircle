@@ -51,7 +51,7 @@ export function inviteEmailHtml(p: {
       <b>${recipientName}</b>: medicación, citas médicas, documentos y avisos
       de toda la familia, en un solo lugar.
     </p>
-    <a href="${p.url}" style="display:inline-block;background:#4A7FA7;color:#fff;
+    <a href="${p.url}" style="display:inline-block;background:#3D6D92;color:#fff;
       text-decoration:none;font-size:17px;font-weight:600;padding:14px 24px;border-radius:12px">
       Unirme al círculo
     </a>

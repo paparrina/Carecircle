@@ -65,12 +65,13 @@ export default async function MedsPage({
     const done = doses.filter((d) => d.log).length;
     return (
       <div>
+        <h1 className="mb-4 text-2xl font-bold text-ink">{t("title")}</h1>
         {tabs}
         <Card>
           <div className="flex items-baseline justify-between">
-            <h1 className="text-[15px] font-semibold uppercase tracking-wide text-ink-secondary">
-              {t("title")}
-            </h1>
+            <h2 className="text-[15px] font-semibold uppercase tracking-wide text-ink-secondary">
+              {t("tabToday")}
+            </h2>
             {doses.length > 0 && (
               <span className="text-[15px] font-semibold text-primary">
                 {t("progress", { done, total: doses.length })}
@@ -118,6 +119,7 @@ export default async function MedsPage({
 
   return (
     <div>
+      <h1 className="mb-4 text-2xl font-bold text-ink">{t("title")}</h1>
       {tabs}
       {!meds || meds.length === 0 ? (
         <Card>

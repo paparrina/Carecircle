@@ -91,6 +91,7 @@ export default async function CalendarPage({
 
     return (
       <div>
+        <h1 className="mb-4 text-2xl font-bold text-ink">{t("title")}</h1>
         {tabs}
         {events.length === 0 ? (
           <Card>
@@ -174,6 +175,7 @@ export default async function CalendarPage({
 
   return (
     <div>
+      <h1 className="mb-4 text-2xl font-bold text-ink">{t("title")}</h1>
       {tabs}
       <Card>
         <div className="mb-2 flex items-center justify-between">

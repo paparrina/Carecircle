@@ -6,10 +6,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: { DEFAULT: "#4A7FA7", soft: "#E8F0F6", dark: "#3A6689" },
+        primary: { DEFAULT: "#3D6D92", soft: "#E8F0F6", dark: "#3A6689" },
         accent: "#F07860", mint: { DEFAULT: "#8FD7BF", soft: "#EAF7F2" },
         success: { DEFAULT: "#3E7C4F", soft: "#E9F3EC" },
-        warning: { DEFAULT: "#B07C2A", soft: "#FBF3E4" },
+        warning: { DEFAULT: "#805510", soft: "#FBF3E4" },
         danger: "#A94442",
         background: "#F7FAFB",
         surface: "#FFFFFF",

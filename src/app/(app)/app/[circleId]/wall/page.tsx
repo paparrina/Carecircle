@@ -164,6 +164,7 @@ export default async function WallPage({
 
   return (
     <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-bold text-ink">{t("title")}</h1>
       {canPost && (
         <Composer
           circleId={circleId}

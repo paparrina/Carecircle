@@ -1,5 +1,6 @@
 {
   "common": {
+    "accountTitle": "My account",
     "appName": "CareCircle",
     "tagline": "Caring together, even from afar",
     "loading": "Loading…",
@@ -66,10 +67,13 @@
     "daysAgo": "{d} days ago"
   },
   "nav": {
+    "label": "Main navigation",
     "home": "Today",
     "calendar": "Calendar",
-    "meds": "Meds",
-    "docs": "Docs",
+    "medsShort": "Doses",
+    "docsShort": "Files",
+    "meds": "Medication",
+    "docs": "Documents",
     "wall": "Wall"
   },
   "call": {

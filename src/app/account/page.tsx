@@ -22,6 +22,7 @@ export default async function AccountPage() {
 
   return (
     <main className="mx-auto max-w-md px-5 py-10">
+      <h1 className="mb-4 text-2xl font-bold text-ink">{tc("accountTitle")}</h1>
       <Card>
         <p className="text-xl font-semibold text-ink">{profile?.full_name}</p>
         <p className="mt-1 text-[16px] text-ink-secondary">{user.email}</p>
