@@ -26,6 +26,44 @@ function matchesLegacyOffice(bytes: Uint8Array, mime: string): boolean {
     : containsStream("Workbook") || containsStream("Book");
 }
 
+const crcTable = Uint32Array.from({ length: 256 }, (_, byte) => {
+  let crc = byte;
+  for (let bit = 0; bit < 8; bit++) {
+    crc = (crc >>> 1) ^ ((crc & 1) === 0 ? 0 : 0xedb88320);
+  }
+  return crc;
+});
+
+function pngCrc(bytes: Uint8Array): number {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc = (crc >>> 8) ^ crcTable[(crc ^ byte) & 0xff];
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function hasValidPngChunks(bytes: Uint8Array): boolean {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const header = 0x49484452; // IHDR
+  const imageData = 0x49444154; // IDAT
+  const end = 0x49454e44; // IEND
+  let hasImageData = false;
+
+  for (let offset = 8; offset + 12 <= bytes.length;) {
+    const length = view.getUint32(offset);
+    const type = view.getUint32(offset + 4);
+    const dataEnd = offset + 8 + length;
+    if (length > 0x7fffffff || dataEnd + 4 > bytes.length) return false;
+    if (offset === 8 ? type !== header || length !== 13 : type === header) return false;
+    if (pngCrc(bytes.subarray(offset + 4, dataEnd)) !== view.getUint32(dataEnd)) return false;
+
+    if (type === imageData) hasImageData = true;
+    if (type === end) return length === 0 && hasImageData && dataEnd + 4 === bytes.length;
+    offset = dataEnd + 4;
+  }
+  return false;
+}
+
 export async function matchesDocumentContent(bytes: Uint8Array, mime: string): Promise<boolean> {
   try {
     const detected = await fileTypeFromBuffer(bytes);
@@ -33,6 +71,7 @@ export async function matchesDocumentContent(bytes: Uint8Array, mime: string): P
       return detected?.ext === "cfb" && matchesLegacyOffice(bytes, mime);
     }
     if (detected?.mime !== mime) return false;
+    if (mime === "image/png") return hasValidPngChunks(bytes);
     if (mime === "application/pdf") {
       return /^%PDF-[12]\.\d/.test(text.decode(bytes.subarray(0, 8))) &&
         /%%EOF\s*$/.test(text.decode(bytes.subarray(-2048)));
